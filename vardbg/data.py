@@ -47,3 +47,16 @@ class FrameInfo:
         self.line = frame.f_lineno
 
         self.file_line = f"{self.file}:{self.line}"
+
+    def to_tuple(self):
+        # Produce an identifying tuple for hashing and equality comparison
+        return self.file, self.line, self.function
+
+    def __hash__(self):
+        return hash(self.to_tuple())
+
+    def __eq__(self, other):
+        return self.to_tuple() == other.to_tuple()
+
+    def __ne__(self, other):
+        return not (self == other)
