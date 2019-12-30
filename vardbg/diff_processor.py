@@ -68,6 +68,10 @@ class DiffProcessor(abc.ABC):
             for key, val in chg:
                 self.print_remove(render.key_var(chg_name, key), val)
 
+            # Get new container contents and log value
+            container = self.new_locals[chg_name]
+            self.vars[data.Variable(chg_name, frame_info)].append(data.VarValue(container, frame_info))
+
         # Otherwise, a variable was deleted
         else:
             # chg is a list of tuples with variable names and values
