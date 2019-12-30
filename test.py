@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from debugger import Debugger
+from vardbg import Debugger
 
 # Example function to debug
 def test_func():
