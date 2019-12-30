@@ -71,17 +71,17 @@ class ConsoleOutput(abc.ABC):
 
         for frame_info, exec_times in self.frame_exec_times.items():
             nr_times = len(exec_times)
-            avg_time = int(statistics.mean(exec_times))
-            total_time = sum(exec_times)
+            avg_time = render.duration_ns(statistics.mean(exec_times))
+            total_time = render.duration_ns(sum(exec_times))
 
             print(
-                f"{frame_info.file_line} | {ansi.bold(nr_times)}x, avg {ansi.bold(avg_time)} ns, total {ansi.bold(total_time)} ns"
+                f"{frame_info.file_line} | {ansi.bold(nr_times)}x, avg {ansi.bold(avg_time)}, total {ansi.bold(total_time)}"
             )
 
     def print_time_summary(self: "Debugger"):
         print()
 
-        exec_time = self.exec_stop_time - self.exec_start_time
+        exec_time = render.duration_ns(self.exec_stop_time - self.exec_start_time)
         print(f"Total execution time: {ansi.bold(exec_time)}")
 
     def print_summary(self: "Debugger"):
