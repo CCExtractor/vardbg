@@ -35,6 +35,14 @@ class ConsoleOutput(abc.ABC):
     def print_remove(self: "Debugger", var, val, *, action="removed"):
         self.print_action(var, ansi.red, action, f"(value: {render.val(val)})")
 
+    def print_frame_exec(self: "Debugger", frame_info, exec_time, exec_times):
+        nr_times = len(exec_times)
+        avg_time = render.duration_ns(statistics.mean(exec_times))
+        total_time = render.duration_ns(sum(exec_times))
+        this_time = render.duration_ns(exec_time)
+
+        print(f"{self.cur_line} | exec {nr_times}x (time: {this_time}, avg {avg_time}, total {total_time})")
+
     def print_var_summary(self: "Debugger"):
         print()
         print("Variables seen:")

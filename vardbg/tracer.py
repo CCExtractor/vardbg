@@ -43,6 +43,9 @@ class Tracer(abc.ABC):
             # Render output prefix for this frame
             self.update_cur_frame(self.prev_frame_info)
 
+            # Call profiler to print this frame's execution
+            self.profile_print_frame()
+
             # Diff and print changes
             diff = dictdiffer.diff(self.prev_locals, self.new_locals)
             self.process_locals_diff(diff, self.prev_frame_info)
