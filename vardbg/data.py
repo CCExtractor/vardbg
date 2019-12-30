@@ -14,7 +14,7 @@ class Variable:
     def to_tuple(self):
         # This produces an identifying tuple for hashing and equality comparison.
         # We ignore value, type, and line here because they can change
-        return (self.name, self._file, self.function)
+        return self.name, self._file, self.function
 
     def __hash__(self):
         return hash(self.to_tuple())

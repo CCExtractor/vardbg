@@ -2,12 +2,14 @@
 
 from vardbg import Debugger
 
+
 # Example function to debug
-def test_func():
+def test_func():  # sourcery off
     y = 9
     x = y * 2
     x *= 2
 
+    # noinspection PyListCreation
     lst = [1]
     lst.append(x)
     lst.append(y)
@@ -19,6 +21,7 @@ def test_func():
     st.update({1, 2, 3, 4, 5})
     st.remove(x)
 
+    # noinspection PyDictCreation
     dct = {"a": 1, "b": 2, "c": 3}
     dct["d"] = 4
     del dct["c"]
