@@ -52,8 +52,12 @@ class Debugger:
             # chg is a list of tuples with keys (index, key, etc.) and values
             for key, val in chg:
                 if isinstance(container, set):
+                    # Move value out of set if there's only 1
+                    if len(val) == 1:
+                        val = val.pop()
+
                     # Show it as an extension for sets
-                    self.print_add(chg_var, val, action="extended", plural=len(val) > 1)
+                    self.print_add(chg_var, val, action="extended", plural=isinstance(val, set))
                 else:
                     # Render it as var[key] for lists, dicts, etc.
                     self.print_add(render_key_var(chg_var, key), val)
