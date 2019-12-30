@@ -11,3 +11,7 @@ class Debugger(ConsoleOutput, DiffProcessor, Profiler, Tracer):
 
         # Initialize mixins
         super().__init__()
+
+
+def debug(func):
+    Debugger(func).run()
