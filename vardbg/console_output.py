@@ -18,7 +18,8 @@ class ConsoleOutput(abc.ABC):
 
     def update_cur_frame(self: "Debugger", frame_info):
         # Construct friendly filename + line number + function string
-        self.cur_line = f"{frame_info.file_line} ({frame_info.function})"
+        file_line = "%s:%-2d" % (frame_info.file, frame_info.line)
+        self.cur_line = f"{file_line} ({frame_info.function})"
 
     def print_action(self: "Debugger", var, color_func, action, suffix):
         print(f"{self.cur_line} | {ansi.bold(var)} {color_func(action)} {suffix}")
@@ -82,9 +83,8 @@ class ConsoleOutput(abc.ABC):
             avg_time = render.duration_ns(statistics.mean(exec_times))
             total_time = render.duration_ns(sum(exec_times))
 
-            print(
-                f"{frame_info.file_line} | {ansi.bold(nr_times)}x, avg {ansi.bold(avg_time)}, total {ansi.bold(total_time)}"
-            )
+            file_line = "%s:%-2d" % (frame_info.file, frame_info.line)
+            print(f"{file_line} | {ansi.bold(nr_times)}x, avg {ansi.bold(avg_time)}, total {ansi.bold(total_time)}")
 
     def print_time_summary(self: "Debugger"):
         print()
