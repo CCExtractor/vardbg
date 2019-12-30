@@ -3,24 +3,7 @@ import sys
 
 import dictdiffer
 
-
-RED = "\u001b[1;31m"
-GREEN = "\u001b[1;32m"
-BLUE = "\u001b[1;34m"
-BOLD = "\u001b[1m"
-RESET = "\u001b[0m"
-
-
-def render_key_var(var, key):
-    return f"{var}[{repr(key)}]"
-
-
-def render_val(val):
-    return f"{BOLD}{repr(val)}{RESET}"
-
-
-def render_file_line(frame):
-    return f"{frame.f_code.co_filename}:{frame.f_lineno}"
+from . import ansi, render
 
 
 class Variable:
@@ -33,7 +16,7 @@ class Variable:
 
         # Extract info from frame
         self._file = frame.f_code.co_filename
-        self.file_line = render_file_line(frame)
+        self.file_line = render.file_line(frame)
         self.function = frame.f_code.co_name
 
     def to_tuple(self):
@@ -56,7 +39,7 @@ class VarValue:
 
     def __init__(self, value, frame):
         self.value = value
-        self.file_line = render_file_line(frame)
+        self.file_line = render.file_line(frame)
 
     @staticmethod
     def value_getter(val):
@@ -77,17 +60,17 @@ class Debugger:
         self.vars = {}
 
     def print_action(self, var, color, action, suffix):
-        print(f"{self.cur_line} | {BOLD}{var}{RESET} {color}{action}{RESET} {suffix}")
+        print(f"{self.cur_line} | {ansi.BOLD}{var}{ansi.RESET} {color}{action}{ansi.RESET} {suffix}")
 
     def print_add(self, var, val, *, action="added", plural=False):
         _plural = "s" if plural else ""
-        self.print_action(var, GREEN, action, f"with value{_plural} {render_val(val)}")
+        self.print_action(var, ansi.GREEN, action, f"with value{_plural} {render.val(val)}")
 
     def print_change(self, var, val_before, val_after, *, action="changed"):
-        self.print_action(var, BLUE, action, f"from {render_val(val_before)} to {render_val(val_after)}")
+        self.print_action(var, ansi.BLUE, action, f"from {render.val(val_before)} to {render.val(val_after)}")
 
     def print_remove(self, var, val, *, action="removed", plural=False):
-        self.print_action(var, RED, action, f"(value: {render_val(val)})")
+        self.print_action(var, ansi.RED, action, f"(value: {render.val(val)})")
 
     def process_add(self, chg_name, chg, frame):
         # If we have a changed variable, elements were added to a list/set/dict
@@ -106,7 +89,7 @@ class Debugger:
                     self.print_add(chg_name, val, action="extended", plural=isinstance(val, set))
                 else:
                     # Render it as var[key] for lists, dicts, etc.
-                    self.print_add(render_key_var(chg_name, key), val)
+                    self.print_add(render.key_var(chg_name, key), val)
 
             self.vars[Variable(chg_name, frame)].append(VarValue(container, frame))
 
@@ -137,7 +120,7 @@ class Debugger:
         # If we have a changed variable, elements were removed from a list/set/dict
         if chg_name:
             for key, val in chg:
-                self.print_remove(render_key_var(chg_name, key), val)
+                self.print_remove(render.key_var(chg_name, key), val)
 
         # Otherwise, a variable was deleted
         else:
@@ -148,7 +131,7 @@ class Debugger:
                 # Find existing equivalent variable object
                 new_var = Variable(name, frame)
                 var = list(filter(lambda v: v == new_var, self.vars.keys()))[0]
-                var.deleted_line = render_file_line(frame)
+                var.deleted_line = render.file_line(frame)
 
     def process_locals_diff(self, diff, frame):
         for action, chg_var, chg in diff:
@@ -171,7 +154,7 @@ class Debugger:
         self.new_locals = copy.deepcopy(frame.f_locals)
 
         # Construct friendly filename + line number + function string
-        self.cur_line = f"{render_file_line(frame)} ({code.co_name})"
+        self.cur_line = f"{render.file_line(frame)} ({code.co_name})"
 
         # Diff and print changes
         diff = dictdiffer.diff(self.prev_locals, self.new_locals)
@@ -193,24 +176,24 @@ class Debugger:
                 min_val = min(values, key=VarValue.value_getter)
                 max_val = max(values, key=VarValue.value_getter)
 
-                min_desc = f"{render_val(min_val.value)} ({min_val.file_line})"
-                max_desc = f"{render_val(max_val.value)} ({max_val.file_line})"
+                min_desc = f"{render.val(min_val.value)} ({min_val.file_line})"
+                max_desc = f"{render.val(max_val.value)} ({max_val.file_line})"
                 values_desc = f" between {min_desc} and {max_desc}"
             else:
                 # Give a list of values for other objects
                 value_lines = [":"]
 
                 for val in values:
-                    value_lines.append(f"{render_val(val.value)} ({val.file_line})")
+                    value_lines.append(f"{render.val(val.value)} ({val.file_line})")
 
                 # Format list
                 values_desc = "\n      - ".join(value_lines)
 
-            definition = f"in {var.function} on {BOLD}{var.file_line}{RESET}"
-            print(f"  - {BOLD}{var.name}{RESET} {GREEN}defined{RESET} {definition} with values{values_desc}")
+            definition = f"in {var.function} on {ansi.BOLD}{var.file_line}{ansi.RESET}"
+            print(f"  - {ansi.BOLD}{var.name}{ansi.RESET} {ansi.GREEN}defined{ansi.RESET} {definition} with values{values_desc}")
 
             if var.deleted_line is not None:
-                print(f"    ({RED}deleted{RESET} on {var.deleted_line})")
+                print(f"    ({ansi.RED}deleted{ansi.RESET} on {var.deleted_line})")
 
     def run(self):
         # Run function with trace callback registered
