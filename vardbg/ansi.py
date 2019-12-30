@@ -7,17 +7,17 @@ BOLD = "\u001b[1m"
 RESET = "\u001b[0m"
 
 
-def red(text):
-    return RED + text + RESET
+def red(content):
+    return RED + str(content) + RESET
 
 
-def green(text):
-    return GREEN + text + RESET
+def green(content):
+    return GREEN + str(content) + RESET
 
 
-def blue(text):
-    return BLUE + text + RESET
+def blue(content):
+    return BLUE + str(content) + RESET
 
 
-def bold(text):
-    return BOLD + text + RESET
+def bold(content):
+    return BOLD + str(content) + RESET
