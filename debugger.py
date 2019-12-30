@@ -9,6 +9,7 @@ import dictdiffer
 RED = "\u001b[1;31m"
 GREEN = "\u001b[1;32m"
 BLUE = "\u001b[1;34m"
+BOLD = "\u001b[1m"
 RESET = "\u001b[0m"
 
 # Example function to debug
@@ -70,15 +71,15 @@ def debug_func(func):
                     for key, val in chg:
                         if isinstance(container, set):
                             # Show it as an extension for sets
-                            print(f"{line} {chg_var} {GREEN}extended{RESET} with {repr(val)}")
+                            print(f"{line} {BOLD}{chg_var}{RESET} {GREEN}extended{RESET} with {BOLD}{repr(val)}{RESET}")
                         else:
                             # Render it as var[key] for lists, dicts, etc.
-                            print(f"{line} {chg_var}[{repr(key)}] {GREEN}added{RESET} with value {repr(val)}")
+                            print(f"{line} {BOLD}{chg_var}[{repr(key)}]{RESET} {GREEN}added{RESET} with value {BOLD}{repr(val)}{RESET}")
                 # Otherwise, it's a new variable
                 else:
                     # chg is a list of tuples with variable names and values
                     for var, val in chg:
-                        print(f"{line} {var} {GREEN}added{RESET} with value {repr(val)}")
+                        print(f"{line} {BOLD}{var}{RESET} {GREEN}added{RESET} with value {BOLD}{repr(val)}{RESET}")
             elif action == dictdiffer.CHANGE:
                 # If the changed variable is given as a list, a list/set/dict element was changed
                 if isinstance(chg_var, list):
@@ -90,17 +91,17 @@ def debug_func(func):
                 # chg_var is the variable that was changed
                 # chg is a tuple with the before and after values
                 before, after = chg
-                print(f"{line} {chg_var} {BLUE}changed{RESET} from {repr(before)} to {repr(after)}")
+                print(f"{line} {BOLD}{chg_var}{RESET} {BLUE}changed{RESET} from {BOLD}{repr(before)}{RESET} to {BOLD}{repr(after)}{RESET}")
             elif action == dictdiffer.REMOVE:
                 # If we have a changed variable, elements were removed from a list/set/dict
                 if chg_var:
                     for key, val in chg:
-                        print(f"{line} {chg_var}[{repr(key)}] {RED}removed{RESET} (value: {repr(val)})")
+                        print(f"{line} {BOLD}{chg_var}[{repr(key)}]{RESET} {RED}removed{RESET} (value: {BOLD}{repr(val)}{RESET})")
                 # Otherwise, a variable was deleted
                 else:
                     # chg is a list of tuples with variable names and values
                     for var, val in chg:
-                        print(f"{line} {var} {RED}deleted{RESET} (value: {repr(val)})")
+                        print(f"{line} {BOLD}{var}{RESET} {RED}deleted{RESET} (value: {BOLD}{repr(val)}{RESET})")
 
         # Update previous locals variable
         fn_locals = new_locals
