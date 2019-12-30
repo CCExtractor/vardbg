@@ -3,58 +3,7 @@ import sys
 
 import dictdiffer
 
-from . import ansi, render
-
-
-class Variable:
-    """Holds information about a variable"""
-
-    def __init__(self, name, frame_info):
-        # Basic variable info
-        self.name = name
-        self.deleted_line = None  # file:line
-
-        # Extract info from frame
-        self._file = frame_info.file
-        self.file_line = frame_info.file_line
-        self.function = frame_info.function
-
-    def to_tuple(self):
-        # This produces an identifying tuple for hashing and equality comparison.
-        # We ignore value, type, and line here because they can change
-        return (self.name, self._file, self.function)
-
-    def __hash__(self):
-        return hash(self.to_tuple())
-
-    def __eq__(self, other):
-        return self.to_tuple() == other.to_tuple()
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class VarValue:
-    """Holds information about a variable value"""
-
-    def __init__(self, value, frame_info):
-        self.value = value
-        self.file_line = frame_info.file_line
-
-    @staticmethod
-    def value_getter(val):
-        return val.value
-
-
-class FrameInfo:
-    """Holds basic information about a stack frame"""
-
-    def __init__(self, frame):
-        self.function = frame.f_code.co_name
-        self.file = frame.f_code.co_filename
-        self.line = frame.f_lineno
-
-        self.file_line = f"{self.file}:{self.line}"
+from . import ansi, data, render
 
 
 class Debugger:
@@ -76,16 +25,11 @@ class Debugger:
 
     def print_add(self, var, val, *, action="added", plural=False):
         _plural = "s" if plural else ""
-        self.print_action(
-            var, ansi.green, action, f"with value{_plural} {render.val(val)}"
-        )
+        self.print_action(var, ansi.green, action, f"with value{_plural} {render.val(val)}")
 
     def print_change(self, var, val_before, val_after, *, action="changed"):
         self.print_action(
-            var,
-            ansi.blue,
-            action,
-            f"from {render.val(val_before)} to {render.val(val_after)}",
+            var, ansi.blue, action, f"from {render.val(val_before)} to {render.val(val_after)}",
         )
 
     def print_remove(self, var, val, *, action="removed", plural=False):
@@ -105,23 +49,19 @@ class Debugger:
                         val = val.pop()
 
                     # Show it as an extension for sets
-                    self.print_add(
-                        chg_name, val, action="extended", plural=isinstance(val, set)
-                    )
+                    self.print_add(chg_name, val, action="extended", plural=isinstance(val, set))
                 else:
                     # Render it as var[key] for lists, dicts, etc.
                     self.print_add(render.key_var(chg_name, key), val)
 
-            self.vars[Variable(chg_name, frame_info)].append(
-                VarValue(container, frame_info)
-            )
+            self.vars[data.Variable(chg_name, frame_info)].append(data.VarValue(container, frame_info))
 
         # Otherwise, it's a new variable
         else:
             # chg is a list of tuples with variable names and values
             for name, val in chg:
                 self.print_add(name, val)
-                self.vars[Variable(name, frame_info)] = [VarValue(val, frame_info)]
+                self.vars[data.Variable(name, frame_info)] = [data.VarValue(val, frame_info)]
 
     def process_change(self, chg_name, chg, frame_info):
         # If the changed variable is given as a list, a list/set/dict element was changed
@@ -137,7 +77,7 @@ class Debugger:
         # chg is a tuple with the before and after values
         before, after = chg
         self.print_change(chg_name, before, after)
-        self.vars[Variable(var_name, frame_info)].append(VarValue(after, frame_info))
+        self.vars[data.Variable(var_name, frame_info)].append(data.VarValue(after, frame_info))
 
     def process_remove(self, chg_name, chg, frame_info):
         # If we have a changed variable, elements were removed from a list/set/dict
@@ -152,7 +92,7 @@ class Debugger:
                 self.print_remove(name, val, action="deleted")
 
                 # Find existing equivalent variable object
-                new_var = Variable(name, frame_info)
+                new_var = data.Variable(name, frame_info)
                 var = list(filter(lambda v: v == new_var, self.vars.keys()))[0]
                 var.deleted_line = frame_info.file_line
 
@@ -187,7 +127,7 @@ class Debugger:
             self.process_locals_diff(diff, self.prev_frame_info)
 
         # Update previous frame info and locals in preparation for the next frame
-        self.prev_frame_info = FrameInfo(frame)
+        self.prev_frame_info = data.FrameInfo(frame)
         self.prev_locals = self.new_locals
         # Subscribe to the next frame, if any
         return self.trace_callback
@@ -200,8 +140,8 @@ class Debugger:
             # Check whether all the values were numbers
             if all(isinstance(val.value, (int, float)) for val in values):
                 # Give a min-max range for numbers
-                min_val = min(values, key=VarValue.value_getter)
-                max_val = max(values, key=VarValue.value_getter)
+                min_val = min(values, key=data.VarValue.value_getter)
+                max_val = max(values, key=data.VarValue.value_getter)
 
                 min_desc = f"{render.val(min_val.value)} ({min_val.file_line})"
                 max_desc = f"{render.val(max_val.value)} ({max_val.file_line})"
@@ -217,9 +157,7 @@ class Debugger:
                 values_desc = "\n      - ".join(value_lines)
 
             definition = f"in {var.function} on {ansi.bold(var.file_line)}"
-            print(
-                f"  - {ansi.bold(var.name)} {ansi.green('defined')} {definition} with values{values_desc}"
-            )
+            print(f"  - {ansi.bold(var.name)} {ansi.green('defined')} {definition} with values{values_desc}")
 
             if var.deleted_line is not None:
                 print(f"    ({ansi.red('deleted')} on {var.deleted_line})")
