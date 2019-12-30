@@ -1,0 +1,14 @@
+# Virtual environment
+venv/
+
+# zsh-autoenv
+.in
+.out
+
+# Editors and IDEs
+.idea/
+.vscode/
+
+# Python bytecode
+__pycache__/
+*.pyc
