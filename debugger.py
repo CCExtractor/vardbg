@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import copy
 import sys
 
@@ -11,34 +9,6 @@ GREEN = "\u001b[1;32m"
 BLUE = "\u001b[1;34m"
 BOLD = "\u001b[1m"
 RESET = "\u001b[0m"
-
-# Example function to debug
-def test_func():
-    y = 9
-    x = y * 2
-    x *= 2
-
-    lst = [1]
-    lst.append(x)
-    lst.append(y)
-    del lst[2], lst[1]
-
-    st = {1}
-    st.add(x)
-    st.add(y)
-    st.update({1, 2, 3, 4, 5})
-    st.remove(x)
-
-    dct = {"a": 1, "b": 2, "c": 3}
-    dct["d"] = 4
-    del dct["c"]
-
-    v1, v2 = 0, 1
-    v1, v2 = 1, 2
-
-    del v1, v2
-
-    print(y, x, lst, st, dct)
 
 
 def debug_func(func):
@@ -74,7 +44,9 @@ def debug_func(func):
                             print(f"{line} {BOLD}{chg_var}{RESET} {GREEN}extended{RESET} with {BOLD}{repr(val)}{RESET}")
                         else:
                             # Render it as var[key] for lists, dicts, etc.
-                            print(f"{line} {BOLD}{chg_var}[{repr(key)}]{RESET} {GREEN}added{RESET} with value {BOLD}{repr(val)}{RESET}")
+                            print(
+                                f"{line} {BOLD}{chg_var}[{repr(key)}]{RESET} {GREEN}added{RESET} with value {BOLD}{repr(val)}{RESET}"
+                            )
                 # Otherwise, it's a new variable
                 else:
                     # chg is a list of tuples with variable names and values
@@ -91,12 +63,16 @@ def debug_func(func):
                 # chg_var is the variable that was changed
                 # chg is a tuple with the before and after values
                 before, after = chg
-                print(f"{line} {BOLD}{chg_var}{RESET} {BLUE}changed{RESET} from {BOLD}{repr(before)}{RESET} to {BOLD}{repr(after)}{RESET}")
+                print(
+                    f"{line} {BOLD}{chg_var}{RESET} {BLUE}changed{RESET} from {BOLD}{repr(before)}{RESET} to {BOLD}{repr(after)}{RESET}"
+                )
             elif action == dictdiffer.REMOVE:
                 # If we have a changed variable, elements were removed from a list/set/dict
                 if chg_var:
                     for key, val in chg:
-                        print(f"{line} {BOLD}{chg_var}[{repr(key)}]{RESET} {RED}removed{RESET} (value: {BOLD}{repr(val)}{RESET})")
+                        print(
+                            f"{line} {BOLD}{chg_var}[{repr(key)}]{RESET} {RED}removed{RESET} (value: {BOLD}{repr(val)}{RESET})"
+                        )
                 # Otherwise, a variable was deleted
                 else:
                     # chg is a list of tuples with variable names and values
@@ -117,8 +93,3 @@ def debug_func(func):
 
     # Remove callback
     sys.settrace(None)
-
-
-if __name__ == "__main__":
-    # Run debugger on test function
-    debug_func(test_func)
