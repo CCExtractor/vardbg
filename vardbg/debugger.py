@@ -9,15 +9,15 @@ from . import ansi, render
 class Variable:
     """Holds information about a variable"""
 
-    def __init__(self, name, frame):
+    def __init__(self, name, frame_info):
         # Basic variable info
         self.name = name
         self.deleted_line = None  # file:line
 
         # Extract info from frame
-        self._file = frame.f_code.co_filename
-        self.file_line = render.file_line(frame)
-        self.function = frame.f_code.co_name
+        self._file = frame_info.file
+        self.file_line = frame_info.file_line
+        self.function = frame_info.function
 
     def to_tuple(self):
         # This produces an identifying tuple for hashing and equality comparison.
@@ -37,20 +37,32 @@ class Variable:
 class VarValue:
     """Holds information about a variable value"""
 
-    def __init__(self, value, frame):
+    def __init__(self, value, frame_info):
         self.value = value
-        self.file_line = render.file_line(frame)
+        self.file_line = frame_info.file_line
 
     @staticmethod
     def value_getter(val):
         return val.value
 
 
+class FrameInfo:
+    """Holds basic information about a stack frame"""
+
+    def __init__(self, frame):
+        self.function = frame.f_code.co_name
+        self.file = frame.f_code.co_filename
+        self.line = frame.f_lineno
+
+        self.file_line = f"{self.file}:{self.line}"
+
+
 class Debugger:
     def __init__(self, func):
         # Function being debugged
         self.func = func
-        # Previous frame's locals
+        # Previous frame and its locals
+        self.prev_frame_info = None
         self.prev_locals = {}
         # New frame's locals
         self.new_locals = {}
@@ -64,15 +76,22 @@ class Debugger:
 
     def print_add(self, var, val, *, action="added", plural=False):
         _plural = "s" if plural else ""
-        self.print_action(var, ansi.green, action, f"with value{_plural} {render.val(val)}")
+        self.print_action(
+            var, ansi.green, action, f"with value{_plural} {render.val(val)}"
+        )
 
     def print_change(self, var, val_before, val_after, *, action="changed"):
-        self.print_action(var, ansi.blue, action, f"from {render.val(val_before)} to {render.val(val_after)}")
+        self.print_action(
+            var,
+            ansi.blue,
+            action,
+            f"from {render.val(val_before)} to {render.val(val_after)}",
+        )
 
     def print_remove(self, var, val, *, action="removed", plural=False):
         self.print_action(var, ansi.red, action, f"(value: {render.val(val)})")
 
-    def process_add(self, chg_name, chg, frame):
+    def process_add(self, chg_name, chg, frame_info):
         # If we have a changed variable, elements were added to a list/set/dict
         if chg_name:
             # Get a reference to the container to check its type
@@ -86,21 +105,25 @@ class Debugger:
                         val = val.pop()
 
                     # Show it as an extension for sets
-                    self.print_add(chg_name, val, action="extended", plural=isinstance(val, set))
+                    self.print_add(
+                        chg_name, val, action="extended", plural=isinstance(val, set)
+                    )
                 else:
                     # Render it as var[key] for lists, dicts, etc.
                     self.print_add(render.key_var(chg_name, key), val)
 
-            self.vars[Variable(chg_name, frame)].append(VarValue(container, frame))
+            self.vars[Variable(chg_name, frame_info)].append(
+                VarValue(container, frame_info)
+            )
 
         # Otherwise, it's a new variable
         else:
             # chg is a list of tuples with variable names and values
             for name, val in chg:
                 self.print_add(name, val)
-                self.vars[Variable(name, frame)] = [VarValue(val, frame)]
+                self.vars[Variable(name, frame_info)] = [VarValue(val, frame_info)]
 
-    def process_change(self, chg_name, chg, frame):
+    def process_change(self, chg_name, chg, frame_info):
         # If the changed variable is given as a list, a list/set/dict element was changed
         if isinstance(chg_name, list):
             # chg_name is a tuple with the variable name and key
@@ -114,9 +137,9 @@ class Debugger:
         # chg is a tuple with the before and after values
         before, after = chg
         self.print_change(chg_name, before, after)
-        self.vars[Variable(var_name, frame)].append(VarValue(after, frame))
+        self.vars[Variable(var_name, frame_info)].append(VarValue(after, frame_info))
 
-    def process_remove(self, chg_name, chg, frame):
+    def process_remove(self, chg_name, chg, frame_info):
         # If we have a changed variable, elements were removed from a list/set/dict
         if chg_name:
             for key, val in chg:
@@ -129,18 +152,18 @@ class Debugger:
                 self.print_remove(name, val, action="deleted")
 
                 # Find existing equivalent variable object
-                new_var = Variable(name, frame)
+                new_var = Variable(name, frame_info)
                 var = list(filter(lambda v: v == new_var, self.vars.keys()))[0]
-                var.deleted_line = render.file_line(frame)
+                var.deleted_line = frame_info.file_line
 
-    def process_locals_diff(self, diff, frame):
+    def process_locals_diff(self, diff, frame_info):
         for action, chg_var, chg in diff:
             if action == dictdiffer.ADD:
-                self.process_add(chg_var, chg, frame)
+                self.process_add(chg_var, chg, frame_info)
             elif action == dictdiffer.CHANGE:
-                self.process_change(chg_var, chg, frame)
+                self.process_change(chg_var, chg, frame_info)
             elif action == dictdiffer.REMOVE:
-                self.process_remove(chg_var, chg, frame)
+                self.process_remove(chg_var, chg, frame_info)
 
     def trace_callback(self, frame, event, arg):
         """Frame execution callback"""
@@ -153,14 +176,18 @@ class Debugger:
         # Get new locals and copy them so they don't change on the next frame
         self.new_locals = copy.deepcopy(frame.f_locals)
 
-        # Construct friendly filename + line number + function string
-        self.cur_line = f"{render.file_line(frame)} ({code.co_name})"
+        # Don't process the first frame since this callback runs *before*
+        # frame execution, not after
+        if self.prev_frame_info is not None:
+            # Construct friendly filename + line number + function string
+            self.cur_line = f"{self.prev_frame_info.file_line} ({code.co_name})"
 
-        # Diff and print changes
-        diff = dictdiffer.diff(self.prev_locals, self.new_locals)
-        self.process_locals_diff(diff, frame)
+            # Diff and print changes
+            diff = dictdiffer.diff(self.prev_locals, self.new_locals)
+            self.process_locals_diff(diff, self.prev_frame_info)
 
-        # Update previous locals in preparation for the next frame
+        # Update previous frame info and locals in preparation for the next frame
+        self.prev_frame_info = FrameInfo(frame)
         self.prev_locals = self.new_locals
         # Subscribe to the next frame, if any
         return self.trace_callback
@@ -190,7 +217,9 @@ class Debugger:
                 values_desc = "\n      - ".join(value_lines)
 
             definition = f"in {var.function} on {ansi.bold(var.file_line)}"
-            print(f"  - {ansi.bold(var.name)} {ansi.green('defined')} {definition} with values{values_desc}")
+            print(
+                f"  - {ansi.bold(var.name)} {ansi.green('defined')} {definition} with values{values_desc}"
+            )
 
             if var.deleted_line is not None:
                 print(f"    ({ansi.red('deleted')} on {var.deleted_line})")

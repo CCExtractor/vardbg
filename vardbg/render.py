@@ -7,7 +7,3 @@ def key_var(var, key):
 
 def val(val):
     return ansi.bold(repr(val))
-
-
-def file_line(frame):
-    return f"{frame.f_code.co_filename}:{frame.f_lineno}"
