@@ -102,14 +102,15 @@ class Debugger:
         """Frame execution callback"""
 
         # Ignore all other functions
-        if frame.f_code != self.func.__code__:
+        code = frame.f_code
+        if code != self.func.__code__:
             return
 
         # Get new locals and copy them so they don't change on the next frame
         self.new_locals = copy.deepcopy(frame.f_locals)
 
-        # Construct friendly filename + line number string
-        self.cur_line = f"{frame.f_code.co_filename}:{frame.f_lineno}"
+        # Construct friendly filename + line number + function string
+        self.cur_line = f"{code.co_filename}:{frame.f_lineno} ({code.co_name})"
 
         # Diff and print changes
         diff = dictdiffer.diff(self.prev_locals, self.new_locals)

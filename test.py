@@ -28,7 +28,8 @@ def test_func():
 
     del v1, v2
 
-    print(y, x, lst, st, dct)
+    print("\nFinal test values:")
+    print("\n".join(f"  {var} = {repr(val)}" for var, val in locals().items()))
 
 
 if __name__ == "__main__":
