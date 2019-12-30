@@ -59,18 +59,18 @@ class Debugger:
         # Full variable + values map
         self.vars = {}
 
-    def print_action(self, var, color, action, suffix):
-        print(f"{self.cur_line} | {ansi.BOLD}{var}{ansi.RESET} {color}{action}{ansi.RESET} {suffix}")
+    def print_action(self, var, color_func, action, suffix):
+        print(f"{self.cur_line} | {ansi.bold(var)} {color_func(action)} {suffix}")
 
     def print_add(self, var, val, *, action="added", plural=False):
         _plural = "s" if plural else ""
-        self.print_action(var, ansi.GREEN, action, f"with value{_plural} {render.val(val)}")
+        self.print_action(var, ansi.green, action, f"with value{_plural} {render.val(val)}")
 
     def print_change(self, var, val_before, val_after, *, action="changed"):
-        self.print_action(var, ansi.BLUE, action, f"from {render.val(val_before)} to {render.val(val_after)}")
+        self.print_action(var, ansi.blue, action, f"from {render.val(val_before)} to {render.val(val_after)}")
 
     def print_remove(self, var, val, *, action="removed", plural=False):
-        self.print_action(var, ansi.RED, action, f"(value: {render.val(val)})")
+        self.print_action(var, ansi.red, action, f"(value: {render.val(val)})")
 
     def process_add(self, chg_name, chg, frame):
         # If we have a changed variable, elements were added to a list/set/dict
@@ -189,11 +189,11 @@ class Debugger:
                 # Format list
                 values_desc = "\n      - ".join(value_lines)
 
-            definition = f"in {var.function} on {ansi.BOLD}{var.file_line}{ansi.RESET}"
-            print(f"  - {ansi.BOLD}{var.name}{ansi.RESET} {ansi.GREEN}defined{ansi.RESET} {definition} with values{values_desc}")
+            definition = f"in {var.function} on {ansi.bold(var.file_line)}"
+            print(f"  - {ansi.bold(var.name)} {ansi.green('defined')} {definition} with values{values_desc}")
 
             if var.deleted_line is not None:
-                print(f"    ({ansi.RED}deleted{ansi.RESET} on {var.deleted_line})")
+                print(f"    ({ansi.red('deleted')} on {var.deleted_line})")
 
     def run(self):
         # Run function with trace callback registered

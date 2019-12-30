@@ -6,7 +6,7 @@ def key_var(var, key):
 
 
 def val(val):
-    return f"{ansi.BOLD}{repr(val)}{ansi.RESET}"
+    return ansi.bold(repr(val))
 
 
 def file_line(frame):
