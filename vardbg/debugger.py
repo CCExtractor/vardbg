@@ -8,8 +8,6 @@ class Debugger(ConsoleOutput, DiffProcessor, Profiler, Tracer):
     def __init__(self, func):
         # Function being debugged
         self.func = func
-        # Current line output prefix
-        self.cur_line = ""
 
         # Initialize mixins
         super().__init__()
