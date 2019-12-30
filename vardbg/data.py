@@ -1,3 +1,20 @@
+import os.path
+
+_relative_path_cache = {}
+
+
+def _get_path(orig_path, relative):
+    if relative:
+        if orig_path in _relative_path_cache:
+            return _relative_path_cache[orig_path]
+        else:
+            rel = os.path.relpath(orig_path)
+            _relative_path_cache[orig_path] = rel
+            return rel
+    else:
+        return orig_path
+
+
 class Variable:
     """Holds information about a variable"""
 
@@ -41,9 +58,9 @@ class VarValue:
 class FrameInfo:
     """Holds basic information about a stack frame"""
 
-    def __init__(self, frame):
+    def __init__(self, frame, *, relative=True):
         self.function = frame.f_code.co_name
-        self.file = frame.f_code.co_filename
+        self.file = _get_path(frame.f_code.co_filename, relative)
         self.line = frame.f_lineno
 
         self.file_line = f"{self.file}:{self.line}"

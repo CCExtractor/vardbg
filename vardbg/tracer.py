@@ -51,7 +51,7 @@ class Tracer(abc.ABC):
             self.process_locals_diff(diff, self.prev_frame_info)
 
         # Update previous frame info in preparation for the next frame
-        self.prev_frame_info = data.FrameInfo(frame)
+        self.prev_frame_info = data.FrameInfo(frame, relative=self.use_relative_paths)
         self.prev_locals = self.new_locals
         self.profile_start_frame()
 

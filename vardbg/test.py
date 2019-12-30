@@ -2,8 +2,6 @@
 
 import time
 
-from vardbg import Debugger
-
 
 # Example function to debug
 def test_func():  # sourcery off
@@ -47,8 +45,3 @@ def test_func():  # sourcery off
     # To facilitate verifying the debugger's values
     print("\nFinal test values:")
     print("\n".join(f"  {var} = {repr(val)}" for var, val in locals().items()))  # Convoluted to avoid mutating locals
-
-
-if __name__ == "__main__":
-    # Run debugger on test function
-    Debugger(test_func).run()

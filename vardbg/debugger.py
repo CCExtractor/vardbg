@@ -5,13 +5,15 @@ from .tracer import Tracer
 
 
 class Debugger(ConsoleOutput, DiffProcessor, Profiler, Tracer):
-    def __init__(self, func):
+    def __init__(self, func, relative_paths=True):
         # Function being debugged
         self.func = func
+        # Whether to use relative paths over absolute ones in output
+        self.use_relative_paths = relative_paths
 
         # Initialize mixins
         super().__init__()
 
 
-def debug(func):
-    Debugger(func).run()
+def debug(*args, **kwargs):
+    Debugger(*args, **kwargs).run()
