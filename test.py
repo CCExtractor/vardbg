@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import debugger
+from debugger import Debugger
 
 # Example function to debug
 def test_func():
@@ -33,4 +33,4 @@ def test_func():
 
 if __name__ == "__main__":
     # Run debugger on test function
-    debugger.debug_func(test_func)
+    Debugger(test_func).run()
