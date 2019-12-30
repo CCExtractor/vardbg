@@ -1,4 +1,5 @@
 import abc
+import statistics
 from typing import TYPE_CHECKING
 
 from . import ansi, data, render
@@ -34,9 +35,9 @@ class ConsoleOutput(abc.ABC):
     def print_remove(self: "Debugger", var, val, *, action="removed"):
         self.print_action(var, ansi.red, action, f"(value: {render.val(val)})")
 
-    def print_summary(self: "Debugger"):
+    def print_var_summary(self: "Debugger"):
         print()
-        print("All variables:")
+        print("Variables seen:")
 
         for var, values in self.vars.items():
             # Check whether all the values were numbers
@@ -63,3 +64,27 @@ class ConsoleOutput(abc.ABC):
 
             if var.deleted_line is not None:
                 print(f"    ({ansi.red('deleted')} on {var.deleted_line})")
+
+    def print_line_summary(self: "Debugger"):
+        print()
+        print("Lines executed:")
+
+        for frame_info, exec_times in self.frame_exec_times.items():
+            nr_times = len(exec_times)
+            avg_time = int(statistics.mean(exec_times))
+            total_time = sum(exec_times)
+
+            print(
+                f"{frame_info.file_line} | {ansi.bold(nr_times)}x, avg {ansi.bold(avg_time)} ns, total {ansi.bold(total_time)} ns"
+            )
+
+    def print_time_summary(self: "Debugger"):
+        print()
+
+        exec_time = self.exec_stop_time - self.exec_start_time
+        print(f"Total execution time: {ansi.bold(exec_time)}")
+
+    def print_summary(self: "Debugger"):
+        self.print_var_summary()
+        self.print_line_summary()
+        self.print_time_summary()

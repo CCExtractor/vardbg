@@ -30,6 +30,10 @@ class Tracer(abc.ABC):
         if code != self.func.__code__:
             return
 
+        # Call profiler first to avoid counting the time it takes to copy locals
+        if self.prev_frame_info is not None:
+            self.profile_complete_frame()
+
         # Get new locals and copy them so they don't change on the next frame
         self.new_locals = copy.deepcopy(frame.f_locals)
 
@@ -43,9 +47,10 @@ class Tracer(abc.ABC):
             diff = dictdiffer.diff(self.prev_locals, self.new_locals)
             self.process_locals_diff(diff, self.prev_frame_info)
 
-        # Update previous frame info and locals in preparation for the next frame
+        # Update previous frame info in preparation for the next frame
         self.prev_frame_info = data.FrameInfo(frame)
         self.prev_locals = self.new_locals
+        self.profile_start_frame()
 
         # Subscribe to the next frame, if any
         return self.trace_callback
@@ -53,7 +58,9 @@ class Tracer(abc.ABC):
     def run(self: "Debugger"):
         # Run function with trace callback registered
         sys.settrace(self.trace_callback)
+        self.profile_start_exec()
         self.func()
+        self.profile_end_exec()
         sys.settrace(None)
 
         self.print_summary()
