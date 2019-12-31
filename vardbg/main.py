@@ -2,8 +2,7 @@ import argparse
 import importlib.util
 from pathlib import Path
 
-from . import ansi, test
-from .debugger import debug
+from . import ansi, debugger, test
 
 
 def parse_args():
@@ -31,24 +30,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def main():
-    args = parse_args()
-
-    # Module defaults to test
-    # Function defaults to test_func if no file specified, otherwise main
-    if args.file is None:
-        mod = test
-        if args.function is None:
-            args.function = "test_func"
-    else:
-        if args.function is None:
-            args.function = "main"
-
-        mod_name = Path(args.file).stem
-        spec = importlib.util.spec_from_file_location(mod_name, args.file)
-        mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(mod)
-
+def do_debug(args, mod):
     # Get the function here regardless of which path we took above
     func = getattr(mod, args.function, None)
     if func is None:
@@ -66,5 +48,40 @@ def main():
             return 1
 
     # Call the actual debugger with our parameters
-    debug(func, relative_paths=not args.absolute_paths, json_output_path=args.output_file)
+    debugger.debug(func, relative_paths=not args.absolute_paths, json_output_path=args.output_file)
     return 0
+
+
+def do_replay(args):
+    debugger.replay(args.file)
+
+
+def main():
+    args = parse_args()
+
+    # Module defaults to test
+    # Function defaults to test_func if no file specified, otherwise main
+    if args.file is None:
+        mod = test
+        if args.function is None:
+            args.function = "test_func"
+
+        # Debug the test function
+        return do_debug(args, mod)
+    else:
+        # Use pathlib to get more info
+        file_path = Path(args.file)
+        if file_path.suffix == ".json":
+            # JSON file means to replay, not debug
+            return do_replay(args)
+        else:
+            if args.function is None:
+                args.function = "main"
+
+            # Load file as module and debug
+            mod_name = Path(args.file).stem
+            spec = importlib.util.spec_from_file_location(mod_name, args.file)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+
+            return do_debug(args, mod)

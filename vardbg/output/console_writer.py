@@ -14,6 +14,14 @@ class ConsoleWriter(Writer):
         file_line = "%s:%-2d" % (frame_info.file, frame_info.line)
         self.cur_line = f"{file_line} ({frame_info.function})"
 
+    def write_frame_exec(self, frame_info, exec_time, exec_times):
+        nr_times = len(exec_times)
+        avg_time = render.duration_ns(statistics.mean(exec_times))
+        total_time = render.duration_ns(sum(exec_times))
+        this_time = render.duration_ns(exec_time)
+
+        print(f"{self.cur_line} | exec {nr_times}x (time: {this_time}, avg {avg_time}, total {total_time})")
+
     def _write_action(self, var, color_func, action, suffix):
         print(f"{self.cur_line} | {ansi.bold(var)} {color_func(action)} {suffix}")
 
@@ -28,14 +36,6 @@ class ConsoleWriter(Writer):
 
     def write_remove(self, var, val, *, action="removed"):
         self._write_action(var, ansi.red, action, f"(value: {render.val(val)})")
-
-    def write_frame_exec(self, frame_info, exec_time, exec_times):
-        nr_times = len(exec_times)
-        avg_time = render.duration_ns(statistics.mean(exec_times))
-        total_time = render.duration_ns(sum(exec_times))
-        this_time = render.duration_ns(exec_time)
-
-        print(f"{self.cur_line} | exec {nr_times}x (time: {this_time}, avg {avg_time}, total {total_time})")
 
     @staticmethod
     def _write_var_summary(var_history):

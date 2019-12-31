@@ -9,6 +9,10 @@ class OutputDelegate(Writer):
         for writer in self.writers:
             writer.write_cur_frame(*args, **kwargs)
 
+    def write_frame_exec(self, *args, **kwargs):
+        for writer in self.writers:
+            writer.write_frame_exec(*args, **kwargs)
+
     def write_add(self, *args, **kwargs):
         for writer in self.writers:
             writer.write_add(*args, **kwargs)
@@ -20,10 +24,6 @@ class OutputDelegate(Writer):
     def write_remove(self, *args, **kwargs):
         for writer in self.writers:
             writer.write_remove(*args, **kwargs)
-
-    def write_frame_exec(self, *args, **kwargs):
-        for writer in self.writers:
-            writer.write_frame_exec(*args, **kwargs)
 
     def write_summary(self, *args, **kwargs):
         for writer in self.writers:

@@ -7,6 +7,10 @@ class Writer(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def write_frame_exec(self, frame_info, exec_time, exec_times):
+        pass
+
+    @abc.abstractmethod
     def write_add(self, var, val, *, action, plural):
         pass
 
@@ -16,10 +20,6 @@ class Writer(abc.ABC):
 
     @abc.abstractmethod
     def write_remove(self, var, val, *, action):
-        pass
-
-    @abc.abstractmethod
-    def write_frame_exec(self, frame_info, exec_time, exec_times):
         pass
 
     @abc.abstractmethod
