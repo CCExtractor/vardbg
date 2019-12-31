@@ -22,18 +22,18 @@ class Debugger(DiffProcessor, Profiler, Replayer, Tracer):
     def close(self):
         self.out.close()
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.close()
+
 
 def debug(func, *args, **kwargs):
-    dbg = Debugger(*args, **kwargs)
-    try:
+    with Debugger(*args, **kwargs) as dbg:
         dbg.run(func)
-    finally:
-        dbg.close()
 
 
 def replay(json_path, *args, **kwargs):
-    dbg = Debugger(*args, **kwargs)
-    try:
+    with Debugger(*args, **kwargs) as dbg:
         dbg.replay(json_path)
-    finally:
-        dbg.close()
