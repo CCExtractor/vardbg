@@ -31,10 +31,10 @@ class DiffProcessor(abc.ABC):
                         val = val.pop()
 
                     # Show it as an extension for sets
-                    self.print_add(chg_name, val, action="extended", plural=isinstance(val, set))
+                    self.out.write_add(chg_name, val, action="extended", plural=isinstance(val, set))
                 else:
                     # Render it as var[key] for lists, dicts, etc.
-                    self.print_add(render.key_var(chg_name, key), val)
+                    self.out.write_add(render.key_var(chg_name, key), val)
 
             # Record new value
             self.vars[data.Variable(chg_name, frame_info)].append(data.VarValue(container, frame_info))
@@ -43,7 +43,7 @@ class DiffProcessor(abc.ABC):
         else:
             # chg is a list of tuples with variable names and values
             for name, val in chg:
-                self.print_add(name, val)
+                self.out.write_add(name, val)
                 self.vars[data.Variable(name, frame_info)] = [data.VarValue(val, frame_info)]
 
     def process_change(self: "Debugger", chg_name, chg, frame_info):
@@ -59,14 +59,14 @@ class DiffProcessor(abc.ABC):
         # chg_name is the variable that was changed
         # chg is a tuple with the before and after values
         before, after = chg
-        self.print_change(chg_name, before, after)
+        self.out.write_change(chg_name, before, after)
         self.vars[data.Variable(var_name, frame_info)].append(data.VarValue(after, frame_info))
 
     def process_remove(self: "Debugger", chg_name, chg, frame_info):
         # If we have a changed variable, elements were removed from a list/set/dict
         if chg_name:
             for key, val in chg:
-                self.print_remove(render.key_var(chg_name, key), val)
+                self.out.write_remove(render.key_var(chg_name, key), val)
 
             # Get new container contents and log value
             container = self.new_locals[chg_name]
@@ -76,7 +76,7 @@ class DiffProcessor(abc.ABC):
         else:
             # chg is a list of tuples with variable names and values
             for name, val in chg:
-                self.print_remove(name, val, action="deleted")
+                self.out.write_remove(name, val, action="deleted")
 
                 # Find existing equivalent variable object
                 new_var = data.Variable(name, frame_info)

@@ -11,8 +11,15 @@ def parse_args():
         description="A simple debugger that traces local variable changes, lines, and times."
     )
 
-    parser.add_argument("-f", "--file", nargs="?", type=str, help="Python file to debug")
+    parser.add_argument("-f", "--file", nargs="?", type=str, help="Python file to debug, or JSON result file to read")
     parser.add_argument("-n", "--function", nargs="?", type=str, help="function to run from the given file")
+    parser.add_argument(
+        "-o",
+        "--output-file",
+        nargs="?",
+        type=str,
+        help="Path to write JSON output file to, default debug_results.json (will be truncated if it already exists and created otherwise)",
+    )
     parser.add_argument(
         "-a",
         "--absolute-paths",

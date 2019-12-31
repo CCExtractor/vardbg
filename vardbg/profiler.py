@@ -35,7 +35,7 @@ class Profiler(abc.ABC):
 
     def profile_print_frame(self: "Debugger"):
         exec_times = self.frame_exec_times[self.prev_frame_info]
-        self.print_frame_exec(self.prev_frame_info, exec_times[-1], exec_times)
+        self.out.write_frame_exec(self.prev_frame_info, exec_times[-1], exec_times)
 
     def profile_start_exec(self: "Debugger"):
         self.exec_start_time = time.time_ns()

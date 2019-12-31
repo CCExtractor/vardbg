@@ -13,6 +13,9 @@ if TYPE_CHECKING:
 
 class Tracer(abc.ABC):
     def __init__(self: "Debugger"):
+        # Function being debugged
+        self.func = None
+
         # Previous frame and its locals
         self.prev_frame_info = None
         self.prev_locals = {}
@@ -41,7 +44,7 @@ class Tracer(abc.ABC):
         # frame execution, not after
         if self.prev_frame_info is not None:
             # Render output prefix for this frame
-            self.update_cur_frame(self.prev_frame_info)
+            self.out.write_cur_frame(self.prev_frame_info)
 
             # Call profiler to print this frame's execution
             self.profile_print_frame()
@@ -58,7 +61,9 @@ class Tracer(abc.ABC):
         # Subscribe to the next frame, if any
         return self.trace_callback
 
-    def run(self: "Debugger"):
+    def run(self: "Debugger", func):
+        self.func = func
+
         # Run function with trace callback registered
         sys.settrace(self.trace_callback)
         self.profile_start_exec()
@@ -66,4 +71,4 @@ class Tracer(abc.ABC):
         self.profile_end_exec()
         sys.settrace(None)
 
-        self.print_summary()
+        self.out.write_summary(self.vars, self.exec_start_time, self.exec_stop_time, self.frame_exec_times)
