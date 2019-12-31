@@ -12,3 +12,6 @@ venv/
 # Python bytecode
 __pycache__/
 *.pyc
+
+# Debug output
+*.json

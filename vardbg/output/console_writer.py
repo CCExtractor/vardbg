@@ -92,3 +92,7 @@ class ConsoleWriter(Writer):
         self._write_var_summary(var_history)
         self._write_line_summary(frame_exec_times)
         self._write_time_summary(exec_start_time, exec_stop_time)
+
+    def close(self):
+        # We print everything live, so there's nothing to close
+        pass

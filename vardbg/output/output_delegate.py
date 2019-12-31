@@ -28,3 +28,7 @@ class OutputDelegate(Writer):
     def write_summary(self, *args, **kwargs):
         for writer in self.writers:
             writer.write_summary(*args, **kwargs)
+
+    def close(self, *args, **kwargs):
+        for writer in self.writers:
+            writer.close(*args, **kwargs)

@@ -17,7 +17,7 @@ def parse_args():
         "-o",
         "--output-file",
         nargs="?",
-        type=str,
+        default="debug_results.json",
         help="Path to write JSON output file to, default debug_results.json (will be truncated if it already exists and created otherwise)",
     )
     parser.add_argument(
@@ -66,5 +66,5 @@ def main():
             return 1
 
     # Call the actual debugger with our parameters
-    debug(func, relative_paths=not args.absolute_paths)
+    debug(func, relative_paths=not args.absolute_paths, json_output_path=args.output_file)
     return 0
