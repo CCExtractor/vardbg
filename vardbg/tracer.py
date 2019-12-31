@@ -67,8 +67,9 @@ class Tracer(abc.ABC):
         # Run function with trace callback registered
         sys.settrace(self.trace_callback)
         self.profile_start_exec()
-        self.func(*args, **kwargs)
+        ret = self.func(*args, **kwargs)
         self.profile_end_exec()
         sys.settrace(None)
 
         self.out.write_summary(self.vars, self.exec_start_time, self.exec_stop_time, self.frame_exec_times)
+        return ret
