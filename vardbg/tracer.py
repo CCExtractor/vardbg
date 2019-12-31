@@ -61,13 +61,13 @@ class Tracer(abc.ABC):
         # Subscribe to the next frame, if any
         return self.trace_callback
 
-    def run(self: "Debugger", func):
+    def run(self: "Debugger", func, *args, **kwargs):
         self.func = func
 
         # Run function with trace callback registered
         sys.settrace(self.trace_callback)
         self.profile_start_exec()
-        self.func()
+        self.func(*args, **kwargs)
         self.profile_end_exec()
         sys.settrace(None)
 
