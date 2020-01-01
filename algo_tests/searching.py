@@ -32,27 +32,35 @@ def binary_search(arr, left, right, x):
 def dfs(graph, node, visited=None):
     if visited is None:
         visited = []
+        first_call = True
+    else:
+        first_call = False
 
     if node not in visited:
-        print(node, end=" ")
         visited.append(node)
         for neighbor in graph[node]:
             dfs(graph, neighbor, visited=visited)
+
+    if first_call:
+        print("Visited nodes: " + " ".join(visited))
 
 
 # Implementation from https://www.educative.io/edpresso/how-to-implement-a-breadth-first-search-in-python
 def bfs(graph, node):
     visited = []  # List to keep track of visited nodes.
     queue = []  # Initialize a queue
+    vs_queue = []  # Output
 
     visited.append(node)
     queue.append(node)
 
     while queue:
         s = queue.pop(0)
-        print(s, end=" ")
+        vs_queue.append(s)
 
         for neighbor in graph[s]:
             if neighbor not in visited:
                 visited.append(neighbor)
                 queue.append(neighbor)
+
+    print("Visited nodes: " + " ".join(vs_queue))
