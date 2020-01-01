@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 
 import sortedcontainers
 
+from . import internal
+
 if TYPE_CHECKING:
     from .debugger import Debugger
 
@@ -42,3 +44,5 @@ class Profiler(abc.ABC):
 
     def profile_end_exec(self: "Debugger"):
         self.exec_stop_time = time.time_ns()
+
+    internal.add_funcs(profile_start_exec, profile_end_exec)

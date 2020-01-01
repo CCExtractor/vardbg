@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import dictdiffer
 
-from . import data
+from . import data, internal
 
 if TYPE_CHECKING:
     from .debugger import Debugger
@@ -84,3 +84,5 @@ class Tracer(abc.ABC):
 
         self.out.write_summary(self.vars, self.exec_start_time, self.exec_stop_time, self.frame_exec_times)
         return ret
+
+    internal.add_funcs(run)
