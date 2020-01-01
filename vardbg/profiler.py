@@ -27,17 +27,17 @@ class Profiler(abc.ABC):
     def profile_start_frame(self: "Debugger"):
         self.prev_frame_start_time = time.time_ns()
 
-    def profile_complete_frame(self: "Debugger"):
+    def profile_complete_frame(self: "Debugger", prev_frame_info):
         exec_time = time.time_ns() - self.prev_frame_start_time
 
-        if self.prev_frame_info in self.frame_exec_times:
-            self.frame_exec_times[self.prev_frame_info].append(exec_time)
+        if prev_frame_info in self.frame_exec_times:
+            self.frame_exec_times[prev_frame_info].append(exec_time)
         else:
-            self.frame_exec_times[self.prev_frame_info] = [exec_time]
+            self.frame_exec_times[prev_frame_info] = [exec_time]
 
-    def profile_print_frame(self: "Debugger"):
-        exec_times = self.frame_exec_times[self.prev_frame_info]
-        self.out.write_frame_exec(self.prev_frame_info, exec_times[-1], exec_times)
+    def profile_print_frame(self: "Debugger", prev_frame_info):
+        exec_times = self.frame_exec_times[prev_frame_info]
+        self.out.write_frame_exec(prev_frame_info, exec_times[-1], exec_times)
 
     def profile_start_exec(self: "Debugger"):
         self.exec_start_time = time.time_ns()

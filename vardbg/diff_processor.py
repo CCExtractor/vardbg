@@ -17,11 +17,11 @@ class DiffProcessor(abc.ABC):
         # Propagate initialization to other mixins
         super().__init__()
 
-    def process_add(self: "Debugger", chg_name, chg, frame_info):
+    def process_add(self: "Debugger", chg_name, chg, frame_info, new_locals):
         # If we have a changed variable, elements were added to a list/set/dict
         if chg_name:
             # Get a reference to the container to check its type
-            container = self.new_locals[chg_name]
+            container = new_locals[chg_name]
 
             # chg is a list of tuples with keys (index, key, etc.) and values
             for key, val in chg:
@@ -62,14 +62,14 @@ class DiffProcessor(abc.ABC):
         self.out.write_change(chg_name, before, after)
         self.vars[data.Variable(var_name, frame_info)].append(data.VarValue(after, frame_info))
 
-    def process_remove(self: "Debugger", chg_name, chg, frame_info):
+    def process_remove(self: "Debugger", chg_name, chg, frame_info, new_locals):
         # If we have a changed variable, elements were removed from a list/set/dict
         if chg_name:
             for key, val in chg:
                 self.out.write_remove(render.key_var(chg_name, key), val)
 
             # Get new container contents and log value
-            container = self.new_locals[chg_name]
+            container = new_locals[chg_name]
             self.vars[data.Variable(chg_name, frame_info)].append(data.VarValue(container, frame_info))
 
         # Otherwise, a variable was deleted
@@ -83,11 +83,11 @@ class DiffProcessor(abc.ABC):
                 var = list(filter(lambda v: v == new_var, self.vars.keys()))[0]
                 var.deleted_line = frame_info.file_line
 
-    def process_locals_diff(self: "Debugger", diff, frame_info):
+    def process_locals_diff(self: "Debugger", diff, frame_info, new_locals):
         for action, chg_var, chg in diff:
             if action == dictdiffer.ADD:
-                self.process_add(chg_var, chg, frame_info)
+                self.process_add(chg_var, chg, frame_info, new_locals)
             elif action == dictdiffer.CHANGE:
                 self.process_change(chg_var, chg, frame_info)
             elif action == dictdiffer.REMOVE:
-                self.process_remove(chg_var, chg, frame_info)
+                self.process_remove(chg_var, chg, frame_info, new_locals)
