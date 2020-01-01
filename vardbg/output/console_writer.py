@@ -78,7 +78,7 @@ class ConsoleWriter(Writer):
             avg_time = render.duration_ns(statistics.mean(exec_times))
             total_time = render.duration_ns(sum(exec_times))
 
-            file_line = "%s:%-2d" % (frame_info.file, frame_info.line)
+            file_line = "%s:%-2d (%s)" % (frame_info.file, frame_info.line, frame_info.function)
             print(f"{file_line} | {ansi.bold(nr_times)}x, avg {ansi.bold(avg_time)}, total {ansi.bold(total_time)}")
 
     @staticmethod
