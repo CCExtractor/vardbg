@@ -1,4 +1,5 @@
 import abc
+import copy
 from typing import TYPE_CHECKING
 
 import dictdiffer
@@ -46,21 +47,24 @@ class DiffProcessor(abc.ABC):
                 self.out.write_add(name, val)
                 self.vars[data.Variable(name, frame_info)] = [data.VarValue(val, frame_info)]
 
-    def process_change(self: "Debugger", chg_name, chg, frame_info):
+    def process_change(self: "Debugger", chg_name, chg, frame_info, new_locals):
+        before, after = chg
+
         # If the changed variable is given as a list, a list/set/dict element was changed
         if isinstance(chg_name, list):
             # chg_name is a tuple with the variable name and key
             var_name, key = chg_name
             # Render it as var_name[key]
             chg_name = f"{var_name}[{repr(key)}]"
+
+            # Full changed value (deep copy to persist value)
+            full_after = copy.deepcopy(new_locals[var_name])
         else:
             var_name = chg_name
+            full_after = after
 
-        # chg_name is the variable that was changed
-        # chg is a tuple with the before and after values
-        before, after = chg
         self.out.write_change(chg_name, before, after)
-        self.vars[data.Variable(var_name, frame_info)].append(data.VarValue(after, frame_info))
+        self.vars[data.Variable(var_name, frame_info)].append(data.VarValue(full_after, frame_info))
 
     def process_remove(self: "Debugger", chg_name, chg, frame_info, new_locals):
         # If we have a changed variable, elements were removed from a list/set/dict
@@ -88,6 +92,6 @@ class DiffProcessor(abc.ABC):
             if action == dictdiffer.ADD:
                 self.process_add(chg_var, chg, frame_info, new_locals)
             elif action == dictdiffer.CHANGE:
-                self.process_change(chg_var, chg, frame_info)
+                self.process_change(chg_var, chg, frame_info, new_locals)
             elif action == dictdiffer.REMOVE:
                 self.process_remove(chg_var, chg, frame_info, new_locals)
