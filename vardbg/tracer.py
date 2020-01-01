@@ -11,6 +11,9 @@ if TYPE_CHECKING:
     from .debugger import Debugger
 
 
+ALLOWED_EVENTS = {"call", "line", "return"}
+
+
 class Tracer(abc.ABC):
     def __init__(self: "Debugger"):
         # Function being debugged
@@ -28,6 +31,10 @@ class Tracer(abc.ABC):
 
     def trace_callback(self: "Debugger", frame, event, arg):
         """Frame execution callback"""
+
+        # Ignore irrelevant events, but still attach to the next one
+        if event not in ALLOWED_EVENTS:
+            return self.trace_callback
 
         # Ignore all other functions
         code = frame.f_code
