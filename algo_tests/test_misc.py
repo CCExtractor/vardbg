@@ -17,5 +17,5 @@ KS_VALUES = [0, 1, 20, 3, 14, 100]
 
 
 def test_misc():
-    print(ansi.bold("Knapsack"))
+    print(ansi.bold("\nKnapsack"))
     debug_func(knapsack, KS_WEIGHTS, KS_VALUES)

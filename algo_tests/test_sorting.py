@@ -8,7 +8,7 @@ SAMPLE_LIST = [19, 2, 31, 45, 6, 11, 121, 27]
 
 def test_sorting():
     for func in SORT_FUNCS:
-        print(ansi.bold(func.__name__.replace("_", " ").title()))
+        print("\n" + ansi.bold(func.__name__.replace("_", " ").title()))
         sorted_list = debug_func(func, SAMPLE_LIST.copy())
 
         print(sorted_list)
