@@ -1,5 +1,5 @@
 from .misc import knapsack
-from vardbg.debugger import Debugger
+from .run import debug_func
 from vardbg import ansi
 
 # | Item | Weight | Value |
@@ -18,5 +18,4 @@ KS_VALUES = [0, 1, 20, 3, 14, 100]
 
 def test_misc():
     print(ansi.bold("Knapsack"))
-    with Debugger() as dbg:
-        dbg.run(knapsack, KS_WEIGHTS, KS_VALUES)
+    debug_func(knapsack, KS_WEIGHTS, KS_VALUES)
