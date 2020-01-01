@@ -11,5 +11,5 @@ def test_sorting():
         print("\n" + ansi.bold(func.__name__.replace("_", " ").title()))
         sorted_list = debug_func(func, SAMPLE_LIST.copy())
 
-        print(sorted_list)
+        print("Sorted list:", sorted_list)
         print()
