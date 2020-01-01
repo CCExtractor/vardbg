@@ -6,9 +6,12 @@ from .tracer import Tracer
 
 
 class Debugger(DiffProcessor, Profiler, Replayer, Tracer):
-    def __init__(self, relative_paths=True, json_output_path=None):
+    def __init__(self, relative_paths=True, json_output_path=None, live_profiler_output=True):
         # Whether to use relative paths over absolute ones in output
         self.use_relative_paths = relative_paths
+
+        # Whether to print profiler output live during execution
+        self.live_profiler_output = live_profiler_output
 
         # Output writers
         writers = [output.ConsoleWriter()]

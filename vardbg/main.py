@@ -26,6 +26,13 @@ def parse_args():
         action="store_true",
         help="whether to use absolute paths instead of relative ones",
     )
+    parser.add_argument(
+        "-P",
+        "--disable-live-profiler",
+        default=False,
+        action="store_true",
+        help="whether to disable live profiler output during execution",
+    )
 
     return parser.parse_args()
 
@@ -48,7 +55,12 @@ def do_debug(args, mod):
             return 1
 
     # Call the actual debugger with our parameters
-    debugger.debug(func, relative_paths=not args.absolute_paths, json_output_path=args.output_file)
+    debugger.debug(
+        func,
+        relative_paths=not args.absolute_paths,
+        json_output_path=args.output_file,
+        live_profiler_output=not args.disable_live_profiler,
+    )
     return 0
 
 
