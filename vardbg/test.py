@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 
+import math
 import time
+
+
+# Sample function to get the value of tau (pi * 2)
+def get_tau():
+    x = math.pi
+    x *= 2
+    return x
 
 
 # Example function to debug
@@ -41,6 +49,9 @@ def test_func():  # sourcery off
     for i in range(5):
         time.sleep(0.01)
         pass
+
+    # Get tau from another function
+    tau = get_tau()
 
     # To facilitate verifying the debugger's values
     print("\nFinal test values:")
