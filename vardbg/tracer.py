@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
 
 ALLOWED_EVENTS = {"call", "line", "return"}
+DISALLOWED_FUNC_NAMES = {"<genexpr>", "<listcomp>", "<dictcomp>"}
 
 
 class FrameScope:
@@ -47,6 +48,11 @@ class Tracer(abc.ABC):
         # Ignore our internal functions
         code = frame.f_code
         if code in internal.INTERNAL_FUNC_CODES:
+            return
+
+        # Ignore comprehensions and generator expressions
+        # (they act strangely and most people wouldn't consider them to be functions)
+        if code.co_name in DISALLOWED_FUNC_NAMES:
             return
 
         # Obtain frame scope
