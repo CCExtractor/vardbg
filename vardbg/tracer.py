@@ -33,28 +33,36 @@ class Tracer(abc.ABC):
         if code != self.func.__code__:
             return
 
-        # Call profiler first to avoid counting the time it takes to copy locals
-        if self.prev_frame_info is not None:
+        # The first frame is when function arguments are populated, so it's important
+        # Set itself to the previous frame since its line number *is* where function arguments are defined
+        frame_info = data.FrameInfo(frame, relative=self.use_relative_paths)
+        if self.prev_frame_info is None:
+            is_first_frame = True
+            self.prev_frame_info = frame_info
+        else:
+            is_first_frame = False
+
+            # Call profiler first to avoid counting the time it takes to copy locals
+            # We skip this for the first frame since nothing's actually executed yet
             self.profile_complete_frame()
 
         # Get new locals and copy them so they don't change on the next frame
         self.new_locals = copy.deepcopy(frame.f_locals)
 
-        # Don't process the first frame since this callback runs *before*
-        # frame execution, not after
-        if self.prev_frame_info is not None:
-            # Render output prefix for this frame
-            self.out.write_cur_frame(self.prev_frame_info)
+        # Render output prefix for this frame
+        self.out.write_cur_frame(self.prev_frame_info)
 
+        # Skip profiler for the first frame since it's before any real execution (just the function call)
+        if not is_first_frame:
             # Call profiler to print this frame's execution
             self.profile_print_frame()
 
-            # Diff and print changes
-            diff = dictdiffer.diff(self.prev_locals, self.new_locals)
-            self.process_locals_diff(diff, self.prev_frame_info)
+        # Diff and print changes
+        diff = dictdiffer.diff(self.prev_locals, self.new_locals)
+        self.process_locals_diff(diff, self.prev_frame_info)
 
         # Update previous frame info in preparation for the next frame
-        self.prev_frame_info = data.FrameInfo(frame, relative=self.use_relative_paths)
+        self.prev_frame_info = frame_info
         self.prev_locals = self.new_locals
         self.profile_start_frame()
 
