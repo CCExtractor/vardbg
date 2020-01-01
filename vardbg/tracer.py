@@ -18,6 +18,7 @@ class Tracer(abc.ABC):
 
         # Previous frame and its locals
         self.prev_frame_info = None
+        self.prev_event = None
         self.prev_locals = {}
         # New frame's locals
         self.new_locals = {}
@@ -37,13 +38,13 @@ class Tracer(abc.ABC):
         # Set itself to the previous frame since its line number *is* where function arguments are defined
         frame_info = data.FrameInfo(frame, relative=self.use_relative_paths)
         if self.prev_frame_info is None:
-            is_first_frame = True
             self.prev_frame_info = frame_info
-        else:
-            is_first_frame = False
+            self.prev_event = event
 
+        # Only invoke profiler if the last event was *not* a function call since nothing's executed yet
+        should_profile = self.prev_event != "call"
+        if should_profile:
             # Call profiler first to avoid counting the time it takes to copy locals
-            # We skip this for the first frame since nothing's actually executed yet
             self.profile_complete_frame()
 
         # Get new locals and copy them so they don't change on the next frame
@@ -53,8 +54,8 @@ class Tracer(abc.ABC):
         self.out.write_cur_frame(self.prev_frame_info)
 
         # Skip profiler for the first frame since it's before any real execution (just the function call)
-        if not is_first_frame:
-            # Call profiler to print this frame's execution
+        if should_profile:
+            # Call profiler to print the last frame's execution
             self.profile_print_frame()
 
         # Diff and print changes
@@ -63,8 +64,10 @@ class Tracer(abc.ABC):
 
         # Update previous frame info in preparation for the next frame
         self.prev_frame_info = frame_info
+        self.prev_event = event
         self.prev_locals = self.new_locals
-        self.profile_start_frame()
+        if event != "call":
+            self.profile_start_frame()
 
         # Subscribe to the next frame, if any
         return self.trace_callback
