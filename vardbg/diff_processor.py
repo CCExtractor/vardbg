@@ -1,5 +1,4 @@
 import abc
-import copy
 from typing import TYPE_CHECKING
 
 import dictdiffer
@@ -57,8 +56,8 @@ class DiffProcessor(abc.ABC):
             # Render it as var_name[key]
             chg_name = f"{var_name}[{repr(key)}]"
 
-            # Full changed value (deep copy to persist value)
-            full_after = copy.deepcopy(new_locals[var_name])
+            # Full changed value
+            full_after = new_locals[var_name]
         else:
             var_name = chg_name
             full_after = after
