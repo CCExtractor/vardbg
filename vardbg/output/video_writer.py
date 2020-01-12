@@ -206,11 +206,11 @@ class VideoWriter(Writer):
 
             self.draw.text((x, y_bottom), line, fill=CLR_FG_BODY, font=self.body_font)
 
-    def _write_action(self, var, color, action, fields, history=None):
+    def _write_action(self, var, color, action, fields, history):
         # Render fields
         fields_text = "\n".join(f"{field}: {value}" for field, value in fields.items())
 
-        if history and history.var_history:
+        if history.var_history:
             values = ["\n\nHistory:"]
 
             for value in history.var_history:
