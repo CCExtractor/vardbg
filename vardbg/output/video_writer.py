@@ -11,6 +11,7 @@ from .writer import Writer
 
 FONT_DIR = Path(__file__).parent / ".." / ".." / "fonts"
 FONT_BODY = (str(FONT_DIR / "FiraMono-Regular.ttf"), 14)
+FONT_CAPTION = (str(FONT_DIR / "Inter-Regular.ttf"), 14)
 FONT_HEAD = (str(FONT_DIR / "FiraMono-Medium.ttf"), 28)
 
 VID_FPS = 1
@@ -35,6 +36,7 @@ class VideoWriter(Writer):
         self.writer = cv2.VideoWriter(path, fourcc, VID_FPS, (VID_W, VID_H))
         # Fonts
         self.body_font = ImageFont.truetype(*FONT_BODY)
+        self.caption_font = ImageFont.truetype(*FONT_CAPTION)
         self.head_font = ImageFont.truetype(*FONT_HEAD)
         # Code box size (to be calculated later)
         self.line_height = None
@@ -58,7 +60,7 @@ class VideoWriter(Writer):
 
             self.line_height = h * LINE_HEIGHT
             self.body_cols = (VID_VAR_X - CODE_PADDING * 2) // w
-            self.body_rows = (VID_H - CODE_PADDING * 2) / self.line_height
+            self.body_rows = ((VID_H - CODE_PADDING * 2) / self.line_height) - 1  # Reserve space for caption
 
         # Draw variable section
         # Divider at 2/3 width
@@ -105,11 +107,7 @@ class VideoWriter(Writer):
             start_extra = abs(start_idx)
             end_idx += start_extra
             start_idx = 0
-        # Add 1 to accommodate for even side line counts
-        if round(ctx_side_lines) % 2 == 0:
-            end_idx += 1
-        # Truncate end index to max
-        end_idx = min(end_idx, len(wrapped_lines) - 1)
+        end_idx += 1
         # Slice selected section
         display_lines = wrapped_lines[start_idx:end_idx]
 
@@ -128,6 +126,14 @@ class VideoWriter(Writer):
             # Draw text
             self.draw.text((x, y_bottom), line, font=self.body_font)
 
+    def _draw_exec(self, nr_times, current, avg, total):
+        x = CODE_PADDING
+        # Padding + body
+        y = CODE_PADDING + self.line_height * self.body_rows
+
+        text = f"Line executed {nr_times} times — current time elapsed: {current}, average: {avg}, total: {total}"
+        self.draw.text((x, y), text, font=self.caption_font)
+
     def write_cur_frame(self, frame_info):
         self._finish_frame()
         self._start_frame()
@@ -139,7 +145,7 @@ class VideoWriter(Writer):
         total_time = render.duration_ns(sum(exec_times))
         this_time = render.duration_ns(exec_time)
 
-        # print(f"{self.cur_line} | exec {nr_times}x (time: {this_time}, avg {avg_time}, total {total_time})")
+        self._draw_exec(nr_times, this_time, avg_time, total_time)
 
     def _write_action(self, var, color_func, action, suffix):
         # print(f"{self.cur_line} | {ansi.bold(var)} {color_func(action)} {suffix}")
