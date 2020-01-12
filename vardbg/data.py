@@ -61,7 +61,8 @@ class VarHistory:
     def __init__(self, var, full_history):
         self.var = var
         self.var_history = full_history[var] if var in full_history else ()
-        self.other_history = {v: h for v, h in full_history.items() if v != var and v.function == var.function}
+        other_history = {v: h for v, h in full_history.items() if v != var and v.function == var.function}
+        self.other_history = list(other_history.items())
 
 
 class FrameInfo:
