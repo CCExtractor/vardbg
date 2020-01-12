@@ -32,13 +32,19 @@ class Replayer(abc.ABC):
                 else:
                     self.frame_exec_times[frame_info] = [exec_time]
             elif evt_type == ADD_VARIABLE:
-                self.out.write_add(event["var_name"], event["value"], action=event["action"], plural=event["plural"])
+                self.out.write_add(
+                    event["var_name"], event["value"], event["history"], action=event["action"], plural=event["plural"],
+                )
             elif evt_type == CHANGE_VARIABLE:
                 self.out.write_change(
-                    event["var_name"], event["value_before"], event["value_after"], action=event["action"]
+                    event["var_name"],
+                    event["value_before"],
+                    event["value_after"],
+                    event["history"],
+                    action=event["action"],
                 )
             elif evt_type == REMOVE_VARIABLE:
-                self.out.write_remove(event["var_name"], event["value"], action=event["action"])
+                self.out.write_remove(event["var_name"], event["value"], event["history"], action=event["action"])
             else:
                 raise ValueError(f"Unrecognized JSON event '{evt_type}'")
 

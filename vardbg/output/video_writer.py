@@ -1,3 +1,4 @@
+import collections
 import statistics
 import textwrap
 from pathlib import Path
@@ -6,7 +7,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-from .. import ansi, render
+from .. import data, render
 from .writer import Writer
 
 FONT_DIR = Path(__file__).parent / ".." / ".." / "fonts"
@@ -19,6 +20,7 @@ VID_W = 1280
 VID_H = 720
 VID_VAR_X = 1280 * 2 // 3  # 2/3 code, 1/3 variables
 
+HEADER_PADDING = 36
 SECT_PADDING = 12
 LINE_HEIGHT = 1.2
 
@@ -27,6 +29,11 @@ CLR_BG = (0x12, 0x12, 0x12, 255)
 CLR_FG_HEADING = (0xFF, 0xFF, 0xFF, 255)
 CLR_FG_BODY = (0xFF, 0xFF, 0xFF, 255 * 70 // 100)  # 70% opacity
 CLR_HIGHLIGHT = (0x42, 0x42, 0x42, 255)
+CLR_RED = (0xF7, 0x8C, 0x6C, 255)
+CLR_GREEN = (0xC3, 0xE8, 0x8D, 255)
+CLR_BLUE = (0x82, 0xAA, 0xFF, 255)
+
+VarState = collections.namedtuple("VarState", ("name", "color", "action", "text_lines"))
 
 
 class VideoWriter(Writer):
@@ -40,12 +47,22 @@ class VideoWriter(Writer):
         self.body_font = ImageFont.truetype(*FONT_BODY)
         self.caption_font = ImageFont.truetype(*FONT_CAPTION)
         self.head_font = ImageFont.truetype(*FONT_HEAD)
-        # Code box size (to be calculated later)
+        # Code body size (to be calculated later)
         self.line_height = None
         self.body_cols = None
         self.body_rows = None
-        # Current frame
+        # Variable body start positions
+        self.vars_x = None
+        self.vars_y = None
+        # Variable body size
+        self.vars_cols = None
+        self.vars_rows = None
+        # Current video frame (image)
         self.frame = None
+        # Current stack frame snapshot (info)
+        self.frame_info = None
+        # Last variable state
+        self.last_var = None
 
     def _draw_text_center(self, x, y, text, font, color):
         w, h = self.draw.textsize(text, font=font)
@@ -67,15 +84,28 @@ class VideoWriter(Writer):
         # Draw variable section
         # Divider at 2/3 width
         self.draw.line(((VID_VAR_X, 0), (VID_VAR_X, VID_H)), fill=CLR_FG_BODY, width=1)
-        # Label horizontally centered in the variable section and 5% of the height
+        # Label horizontally centered in the variable section and vertically padded
         self._draw_text_center(
-            VID_VAR_X + ((VID_W - VID_VAR_X) / 2), VID_H * 5 // 100, "Last Variable", self.head_font, CLR_FG_HEADING
+            VID_VAR_X + ((VID_W - VID_VAR_X) / 2), HEADER_PADDING, "Last Variable", self.head_font, CLR_FG_HEADING
         )
+        # Save variable body start positions and size (if necessary)
+        if self.vars_x is None:
+            self.vars_x = VID_VAR_X + SECT_PADDING
+            hw, hh = self.draw.textsize("A", font=self.head_font)
+            self.vars_y = HEADER_PADDING * 2 + hh
+
+            vw, vh = self.draw.textsize("A", font=self.body_font)
+            self.vars_cols = (VID_W - VID_VAR_X - SECT_PADDING * 2) // vw
+            self.vars_rows = self.body_rows
 
     def _finish_frame(self):
         # Bail out if there's no frame to finish
         if self.frame is None:
             return
+
+        # Draw variable state (if available)
+        if self.last_var is not None:
+            self._draw_variable(self.last_var)
 
         # Convert PIL -> Numpy array and RGBA -> BGR colors
         cv_img = cv2.cvtColor(np.asarray(self.frame), cv2.COLOR_RGBA2BGR)
@@ -158,25 +188,69 @@ class VideoWriter(Writer):
 
         self._draw_exec(nr_times, this_time, avg_time, total_time)
 
-    def _write_action(self, var, color_func, action, suffix):
-        # print(f"{self.cur_line} | {ansi.bold(var)} {color_func(action)} {suffix}")
-        pass
+    def _draw_variable(self, var):
+        # Draw variable name
+        nw, nh = self.draw.textsize(var.name + " ", font=self.body_font)
+        self.draw.text((self.vars_x, self.vars_y - nh), var.name + " ", fill=CLR_FG_BODY, font=self.body_font)
+        # Draw action with color
+        self.draw.text((self.vars_x + nw, self.vars_y - nh), var.action, fill=var.color, font=self.body_font)
 
-    def write_add(self, var, val, *, action="added", plural=False):
-        _plural = "s" if plural else ""
-        self._write_action(var, ansi.green, action, f"with value{_plural} {render.val(val)}")
+        # Draw remaining text
+        for i, line in enumerate(var.text_lines):
+            # Calculate line coordinates
+            x = self.vars_x
+            y_top = self.vars_y + self.line_height * (i + 1)
+            y_bottom = y_top - self.line_height
 
-    def write_change(self, var, val_before, val_after, *, action="changed"):
+            self.draw.text((x, y_bottom), line, fill=CLR_FG_BODY, font=self.body_font)
+
+    def _write_action(self, var, color, action, fields, history=None):
+        # Render fields
+        fields_text = "\n".join(f"{field}: {value}" for field, value in fields.items())
+
+        if history:
+            values = ["\n\nHistory:"]
+
+            for value in history:
+                values.append(repr(value.value))
+
+            history_text = "\n    \u2022 ".join(values)
+        else:
+            history_text = ""
+
+        # Render and split full text
+        text = fields_text + history_text
+        lines = text.split("\n")
+
+        # Wrap text
+        wrapped_lines = []
+        for line in lines:
+            line_wrapped = textwrap.wrap(line, width=self.vars_cols, max_lines=self.vars_rows)
+            if len(line_wrapped) == 0:
+                wrapped_lines.append("")
+            else:
+                wrapped_lines += line_wrapped
+
+        # Save state; this is drawn when the frame is finished
+        self.last_var = VarState(var, color, action, wrapped_lines)
+
+    def write_add(self, var, val, history, *, action="added", plural):
+        self._write_action(var, CLR_GREEN, action, {"Value": render.val(val)}, history)
+
+    def write_change(self, var, val_before, val_after, history, *, action="changed"):
         self._write_action(
-            var, ansi.blue, action, f"from {render.val(val_before)} to {render.val(val_after)}",
+            var, CLR_BLUE, action, {"From": render.val(val_before), "To": render.val(val_after)}, history,
         )
 
-    def write_remove(self, var, val, *, action="removed"):
-        self._write_action(var, ansi.red, action, f"(value: {render.val(val)})")
+    def write_remove(self, var, val, history, *, action="removed"):
+        self._write_action(var, CLR_RED, action, {"Last value": render.val(val)}, history)
 
     def write_summary(self, var_history, exec_start_time, exec_stop_time, frame_exec_times):
+        # Video doesn't have a summary
         pass
 
     def close(self):
+        # Finish final frame
+        self._finish_frame()
         # Close writer
         self.writer.release()

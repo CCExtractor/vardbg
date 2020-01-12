@@ -17,11 +17,19 @@ class DiffProcessor(abc.ABC):
         # Propagate initialization to other mixins
         super().__init__()
 
+    def _get_history(self, wrapper):
+        if wrapper in self.vars:
+            return self.vars[wrapper].copy()
+
+        return ()
+
     def process_add(self: "Debugger", chg_name, chg, frame_info, new_locals):
         # If we have a changed variable, elements were added to a list/set/dict
         if chg_name:
             # Get a reference to the container to check its type
             container = new_locals[chg_name]
+            # Construct variable wrapper
+            wrapper = data.Variable(chg_name, frame_info)
 
             # chg is a list of tuples with keys (index, key, etc.) and values
             for key, val in chg:
@@ -31,20 +39,23 @@ class DiffProcessor(abc.ABC):
                         val = val.pop()
 
                     # Show it as an extension for sets
-                    self.out.write_add(chg_name, val, action="extended", plural=isinstance(val, set))
+                    self.out.write_add(
+                        chg_name, val, self._get_history(wrapper), action="extended", plural=isinstance(val, set)
+                    )
                 else:
                     # Render it as var[key] for lists, dicts, etc.
-                    self.out.write_add(render.key_var(chg_name, key), val)
+                    self.out.write_add(render.key_var(chg_name, key), val, self._get_history(wrapper))
 
             # Record new value
-            self.vars[data.Variable(chg_name, frame_info)].append(data.VarValue(container, frame_info))
+            self.vars[wrapper].append(data.VarValue(container, frame_info))
 
         # Otherwise, it's a new variable
         else:
             # chg is a list of tuples with variable names and values
             for name, val in chg:
-                self.out.write_add(name, val)
-                self.vars[data.Variable(name, frame_info)] = [data.VarValue(val, frame_info)]
+                wrapper = data.Variable(name, frame_info)
+                self.out.write_add(name, val, self._get_history(wrapper))
+                self.vars[wrapper] = [data.VarValue(val, frame_info)]
 
     def process_change(self: "Debugger", chg_name, chg, frame_info, new_locals):
         before, after = chg
@@ -62,28 +73,34 @@ class DiffProcessor(abc.ABC):
             var_name = chg_name
             full_after = after
 
-        self.out.write_change(chg_name, before, after)
-        self.vars[data.Variable(var_name, frame_info)].append(data.VarValue(full_after, frame_info))
+        wrapper = data.Variable(var_name, frame_info)
+        self.out.write_change(chg_name, before, after, self._get_history(wrapper))
+        self.vars[wrapper].append(data.VarValue(full_after, frame_info))
 
     def process_remove(self: "Debugger", chg_name, chg, frame_info, new_locals):
         # If we have a changed variable, elements were removed from a list/set/dict
         if chg_name:
+            # Construct variable wrapper
+            wrapper = data.Variable(chg_name, frame_info)
+
             for key, val in chg:
-                self.out.write_remove(render.key_var(chg_name, key), val)
+                self.out.write_remove(render.key_var(chg_name, key), val, self._get_history(wrapper))
 
             # Get new container contents and log value
             container = new_locals[chg_name]
-            self.vars[data.Variable(chg_name, frame_info)].append(data.VarValue(container, frame_info))
+            self.vars[wrapper].append(data.VarValue(container, frame_info))
 
         # Otherwise, a variable was deleted
         else:
             # chg is a list of tuples with variable names and values
             for name, val in chg:
-                self.out.write_remove(name, val, action="deleted")
+                # Construct variable wrapper
+                wrapper = data.Variable(name, frame_info)
 
-                # Find existing equivalent variable object
-                new_var = data.Variable(name, frame_info)
-                var = list(filter(lambda v: v == new_var, self.vars.keys()))[0]
+                self.out.write_remove(name, val, self._get_history(wrapper), action="deleted")
+
+                # Find existing equivalent wrapper object
+                var = list(filter(lambda v: v == wrapper, self.vars.keys()))[0]
                 var.deleted_line = frame_info.file_line
 
     def process_locals_diff(self: "Debugger", diff, frame_info, new_locals):

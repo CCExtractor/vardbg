@@ -11,15 +11,15 @@ class Writer(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def write_add(self, var, val, *, action, plural):
+    def write_add(self, var, val, history, *, action, plural):
         pass
 
     @abc.abstractmethod
-    def write_change(self, var, val_before, val_after, *, action):
+    def write_change(self, var, val_before, val_after, history, *, action):
         pass
 
     @abc.abstractmethod
-    def write_remove(self, var, val, *, action):
+    def write_remove(self, var, val, history, *, action):
         pass
 
     @abc.abstractmethod
