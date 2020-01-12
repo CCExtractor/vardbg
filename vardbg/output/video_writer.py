@@ -13,7 +13,7 @@ from .writer import Writer
 FONT_DIR = Path(__file__).parent / ".." / ".." / "fonts"
 FONT_BODY = (str(FONT_DIR / "FiraMono-Regular.ttf"), 16)
 FONT_CAPTION = (str(FONT_DIR / "Inter-Regular.ttf"), 16)
-FONT_HEAD = (str(FONT_DIR / "FiraMono-Medium.ttf"), 32)
+FONT_HEAD = (str(FONT_DIR / "Inter-Regular.ttf"), 32)
 
 VID_FPS = 1
 VID_W = 1920
