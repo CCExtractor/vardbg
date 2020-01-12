@@ -20,7 +20,7 @@ VID_FPS = 1
 VID_W = 1920
 VID_H = 1080
 VID_VAR_X = VID_W * 2 // 3  # 2/3 code, 1/3 variables
-VID_VAR_OTHER_Y = VID_H * 1 // 6  # 1/6 last variable, 5/6 other variables
+VID_VAR_OTHER_Y = VID_H * 1 // 4  # 1/4 last variable, 3/4 other variables
 
 HEADER_PADDING = 20
 SECT_PADDING = 20
