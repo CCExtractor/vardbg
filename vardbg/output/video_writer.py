@@ -62,7 +62,7 @@ class VideoWriter(Writer):
 
         # Draw variable section
         # Divider at 2/3 width
-        self.draw.line(((VID_VAR_X, 0), (VID_VAR_X, VID_H)), fill=CLR_FG_HEADING, width=2)
+        self.draw.line(((VID_VAR_X, 0), (VID_VAR_X, VID_H)), fill=CLR_FG_BODY, width=1)
         # Label horizontally centered in the variable section and 5% of the height
         self._draw_text_center(
             VID_VAR_X + ((VID_W - VID_VAR_X) / 2), VID_H * 5 // 100, "Last Variable", self.head_font, CLR_FG_HEADING
