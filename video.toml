@@ -6,7 +6,9 @@ height = 1080
 fps = 1.5
 
 # Text to display on an intro screen (empty to disable)
-intro_text = ""
+intro_text = "Test Demo Video"
+# Time to show the intro screen, in seconds (ignored if text is empty)
+intro_time = 5
 # Whether to show a watermark in the bottom-right corner
 watermark = true
 
@@ -38,6 +40,10 @@ caption_size = 16
 # Heading font, used to show headings in the variable sections
 heading = "$VARDBG/fonts/Inter-Regular.ttf"
 heading_size = 24
+
+# Intro font, used to render the intro screen
+intro = "$VARDBG/fonts/Inter-Bold.ttf"
+intro_size = 48
 
 [colors]
 # These are RGBA color tuples

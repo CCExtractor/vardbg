@@ -37,7 +37,8 @@ class Config:
         self.h = general["height"]
         self.fps = general["fps"]
 
-        self.intro_text = general["intro_text"] or None
+        self.intro_text = general["intro_text"]
+        self.intro_time = general["intro_time"]
         self.watermark = general["watermark"]
 
         sizes = self.config["sizes"]
@@ -56,6 +57,7 @@ class Config:
         self.font_body_bold = (sub_path(fonts["body_bold"]), fonts["body_size"])
         self.font_caption = (sub_path(fonts["caption"]), fonts["caption_size"])
         self.font_heading = (sub_path(fonts["heading"]), fonts["heading_size"])
+        self.font_intro = (sub_path(fonts["intro"]), fonts["intro_size"])
 
         colors = self.config["colors"]
         self.bg = tuple(colors["background"])

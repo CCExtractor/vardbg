@@ -29,6 +29,7 @@ class FrameRenderer:
         self.body_bold_font = ImageFont.truetype(*self.cfg.font_body_bold)
         self.caption_font = ImageFont.truetype(*self.cfg.font_caption)
         self.head_font = ImageFont.truetype(*self.cfg.font_heading)
+        self.intro_font = ImageFont.truetype(*self.cfg.font_intro)
         # Code body size (to be calculated later)
         self.line_height = None
         self.body_cols = None
@@ -46,6 +47,10 @@ class FrameRenderer:
         # Current video frame (image)
         self.frame = None
 
+        # Write intro (if necessary)
+        if self.cfg.intro_text and self.cfg.intro_time:
+            self.write_intro()
+
     def get_color(self, col):
         if col == self.RED:
             return self.cfg.red
@@ -58,11 +63,15 @@ class FrameRenderer:
         w, h = self.draw.textsize(text, font=font)
         self.draw.text((x - w / 2, y - h / 2), text, font=font, fill=color)
 
-    def start_frame(self):
+    def new_frame(self):
         # Create image
         self.frame = Image.new("RGB", (self.cfg.w, self.cfg.h), self.cfg.bg)
         # Create drawing context
         self.draw = ImageDraw.Draw(self.frame)
+
+    def start_frame(self):
+        self.new_frame()
+
         # Calculate code box size (if necessary)
         if self.line_height is None:
             w, h = self.draw.textsize("A", font=self.body_font)
@@ -125,6 +134,15 @@ class FrameRenderer:
         cv_img = cv2.cvtColor(np.asarray(self.frame), cv2.COLOR_RGB2BGR)
         # Write data
         self.writer.write(cv_img)
+
+    def write_intro(self):
+        frames = round(self.cfg.intro_time / self.cfg.fps)
+        for _ in range(frames):
+            self.new_frame()
+            x = self.cfg.w / 2
+            y = self.cfg.h / 2
+            self.draw_text_center(x, y, self.cfg.intro_text, self.intro_font, self.cfg.fg_heading)
+            self.finish_frame(None)
 
     def draw_code(self, lines, cur_line):
         cur_idx = cur_line - 1
