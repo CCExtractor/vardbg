@@ -169,7 +169,7 @@ class FrameRenderer:
                 self.draw.rectangle(((x, y_top), (x_max, y_bottom)), fill=self.cfg.highlight)
 
             # Draw text
-            self.draw.text((x, y_bottom), line, font=self.body_font)
+            self.draw.text((x, y_bottom), line, fill=self.cfg.fg_body, font=self.body_font)
 
     def draw_exec(self, nr_times, cur, avg, total):
         x = self.cfg.sect_padding
