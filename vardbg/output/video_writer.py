@@ -141,12 +141,13 @@ class VideoWriter(Writer):
         self._start_frame()
         self._draw_code(frame_info)
 
-    def _draw_exec(self, nr_times, current, avg, total):
+    def _draw_exec(self, nr_times, cur, avg, total):
         x = CODE_PADDING
         # Padding + body
         y = CODE_PADDING + self.line_height * self.body_rows
 
-        text = f"Line executed {nr_times} times — current time elapsed: {current}, average: {avg}, total: {total}"
+        plural = "" if nr_times == 1 else "s"
+        text = f"Line executed {nr_times} time{plural} — current time elapsed: {cur}, average: {avg}, total: {total}"
         self.draw.text((x, y), text, font=self.caption_font)
 
     def write_frame_exec(self, frame_info, exec_time, exec_times):
