@@ -18,10 +18,7 @@ class DiffProcessor(abc.ABC):
         super().__init__()
 
     def _get_history(self, wrapper):
-        if wrapper in self.vars:
-            return self.vars[wrapper].copy()
-
-        return ()
+        return data.VarHistory(wrapper, self.vars)
 
     def process_add(self: "Debugger", chg_name, chg, frame_info, new_locals):
         # If we have a changed variable, elements were added to a list/set/dict

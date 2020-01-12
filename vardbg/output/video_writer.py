@@ -213,7 +213,7 @@ class VideoWriter(Writer):
         if history:
             values = ["\n\nHistory:"]
 
-            for value in history:
+            for value in history.var_history:
                 values.append(repr(value.value))
 
             history_text = "\n    \u2022 ".join(values)

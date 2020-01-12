@@ -1,3 +1,4 @@
+import copy
 import time
 import jsonpickle
 
@@ -37,7 +38,7 @@ class JsonWriter(Writer):
 
     def write_add(self, var, val, history, *, action="added", plural=False):
         self.write_event(
-            ADD_VARIABLE, var_name=var, value=val, history=history, action=action, plural=plural,
+            ADD_VARIABLE, var_name=var, value=val, history=copy.deepcopy(history), action=action, plural=plural,
         )
 
     def write_change(self, var, val_before, val_after, history, *, action="changed"):
@@ -46,12 +47,12 @@ class JsonWriter(Writer):
             var_name=var,
             value_before=val_before,
             value_after=val_after,
-            history=history,
+            history=copy.deepcopy(history),
             action=action,
         )
 
     def write_remove(self, var, val, history, *, action="removed"):
-        self.write_event(REMOVE_VARIABLE, var_name=var, value=val, history=history, action=action)
+        self.write_event(REMOVE_VARIABLE, var_name=var, value=val, history=copy.deepcopy(history), action=action)
 
     def write_summary(self, var_history, exec_start_time, exec_stop_time, frame_exec_times):
         # frame_exec_times is skipped because it can be readily reconstructed during replay

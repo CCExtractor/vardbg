@@ -55,6 +55,15 @@ class VarValue:
         return val.value
 
 
+class VarHistory:
+    """Holds information about a variable's history and its context"""
+
+    def __init__(self, var, full_history):
+        self.var = var
+        self.var_history = full_history[var] if var in full_history else ()
+        self.other_history = {wrapper: history for wrapper, history in full_history.items() if wrapper != var}
+
+
 class FrameInfo:
     """Holds basic information about a stack frame"""
 
