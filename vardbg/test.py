@@ -48,7 +48,7 @@ def test_func():  # sourcery off
     # Executing lines multiple times and profiling them
     for i in range(5):
         time.sleep(0.01)
-        pass
+        pass  # This is an intentionally very long line that exists solely for the purpose of testing line wrapping functionality in the video output writer's text renderer, ignore and do not wrap this line so that it remains useful for its purpose
 
     # Get tau from another function
     tau = get_tau()
