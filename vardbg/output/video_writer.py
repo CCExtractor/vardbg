@@ -11,14 +11,14 @@ from .. import render
 from .writer import Writer
 
 FONT_DIR = Path(__file__).parent / ".." / ".." / "fonts"
-FONT_BODY = (str(FONT_DIR / "FiraMono-Regular.ttf"), 14)
-FONT_CAPTION = (str(FONT_DIR / "Inter-Regular.ttf"), 14)
-FONT_HEAD = (str(FONT_DIR / "FiraMono-Medium.ttf"), 28)
+FONT_BODY = (str(FONT_DIR / "FiraMono-Regular.ttf"), 16)
+FONT_CAPTION = (str(FONT_DIR / "Inter-Regular.ttf"), 16)
+FONT_HEAD = (str(FONT_DIR / "FiraMono-Medium.ttf"), 32)
 
 VID_FPS = 1
-VID_W = 1280
-VID_H = 720
-VID_VAR_X = 1280 * 2 // 3  # 2/3 code, 1/3 variables
+VID_W = 1920
+VID_H = 1080
+VID_VAR_X = VID_W * 2 // 3  # 2/3 code, 1/3 variables
 
 HEADER_PADDING = 36
 SECT_PADDING = 12
