@@ -60,7 +60,7 @@ class FrameRenderer:
 
     def start_frame(self):
         # Create image
-        self.frame = Image.new("RGBA", (self.cfg.w, self.cfg.h), self.cfg.bg)
+        self.frame = Image.new("RGB", (self.cfg.w, self.cfg.h), self.cfg.bg)
         # Create drawing context
         self.draw = ImageDraw.Draw(self.frame)
         # Calculate code box size (if necessary)
@@ -120,9 +120,9 @@ class FrameRenderer:
         if self.cfg.watermark:
             self.draw_watermark()
 
-        # Convert PIL -> Numpy array and RGBA -> BGR colors
+        # Convert PIL -> Numpy array and RGB -> BGR colors
         # noinspection PyUnresolvedReferences
-        cv_img = cv2.cvtColor(np.asarray(self.frame), cv2.COLOR_RGBA2BGR)
+        cv_img = cv2.cvtColor(np.asarray(self.frame), cv2.COLOR_RGB2BGR)
         # Write data
         self.writer.write(cv_img)
 
