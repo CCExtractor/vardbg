@@ -14,14 +14,15 @@ FONT_DIR = Path(__file__).parent / ".." / ".." / "fonts"
 FONT_BODY = (str(FONT_DIR / "FiraMono-Regular.ttf"), 16)
 FONT_BODY_BOLD = (str(FONT_DIR / "FiraMono-Bold.ttf"), 16)
 FONT_CAPTION = (str(FONT_DIR / "Inter-Regular.ttf"), 16)
-FONT_HEAD = (str(FONT_DIR / "Inter-Regular.ttf"), 32)
+FONT_HEAD = (str(FONT_DIR / "Inter-Regular.ttf"), 24)
 
 VID_FPS = 1
 VID_W = 1920
 VID_H = 1080
 VID_VAR_X = VID_W * 2 // 3  # 2/3 code, 1/3 variables
+VID_VAR_OTHER_Y = VID_H * 1 // 6  # 1/6 last variable, 5/6 other variables
 
-HEADER_PADDING = 36
+HEADER_PADDING = 20
 SECT_PADDING = 20
 LINE_HEIGHT = 1.2
 
@@ -34,7 +35,7 @@ CLR_RED = (0xF7, 0x8C, 0x6C, 255)
 CLR_GREEN = (0xC3, 0xE8, 0x8D, 255)
 CLR_BLUE = (0x82, 0xAA, 0xFF, 255)
 
-VarState = collections.namedtuple("VarState", ("name", "color", "action", "text_lines"))
+VarState = collections.namedtuple("VarState", ("name", "color", "action", "text_lines", "other_text_lines"))
 
 
 def wrap_text(text, cols, rows):
@@ -76,9 +77,13 @@ class VideoWriter(Writer):
         # Variable body start positions
         self.vars_x = None
         self.vars_y = None
+        self.ovars_x = None
+        self.ovars_y = None
         # Variable body size
         self.vars_cols = None
         self.vars_rows = None
+        self.ovars_cols = None
+        self.ovars_rows = None
         # Current video frame (image)
         self.frame = None
         # Current stack frame snapshot (info)
@@ -104,21 +109,39 @@ class VideoWriter(Writer):
             self.body_rows = ((VID_H - SECT_PADDING * 2) / self.line_height) - 1  # Reserve space for caption
 
         # Draw variable section
-        # Divider at 2/3 width
+        # Vertical divider at 2/3 width
         self.draw.line(((VID_VAR_X, 0), (VID_VAR_X, VID_H)), fill=CLR_FG_BODY, width=1)
         # Label horizontally centered in the variable section and vertically padded
-        self._draw_text_center(
-            VID_VAR_X + ((VID_W - VID_VAR_X) / 2), HEADER_PADDING, "Last Variable", self.head_font, CLR_FG_HEADING
-        )
-        # Save variable body start positions and size (if necessary)
+        var_center_x = VID_VAR_X + ((VID_W - VID_VAR_X) / 2)
+        self._draw_text_center(var_center_x, HEADER_PADDING, "Last Variable", self.head_font, CLR_FG_HEADING)
+
+        # Draw other variables section
+        # Horizontal divider at 1/3 height
+        self.draw.line(((VID_VAR_X, VID_VAR_OTHER_Y), (VID_W, VID_VAR_OTHER_Y)), fill=CLR_FG_BODY, width=1)
+        # Label similar to the first, but in the others section instead
+        ovar_label_y = VID_VAR_OTHER_Y + HEADER_PADDING
+        self._draw_text_center(var_center_x, ovar_label_y, "Other Variables", self.head_font, CLR_FG_HEADING)
+
+        # Save variable body start positions and sizes (if necessary)
         if self.vars_x is None:
+            # Top-left X and Y for last variable section
             self.vars_x = VID_VAR_X + SECT_PADDING
             hw, hh = self.draw.textsize("A", font=self.head_font)
             self.vars_y = HEADER_PADDING * 2 + hh
 
+            # Columns and rows for last variable section
             vw, vh = self.draw.textsize("A", font=self.body_font)
             self.vars_cols = (VID_W - VID_VAR_X - SECT_PADDING * 2) // vw
-            self.vars_rows = self.body_rows
+            self.vars_rows = int(((VID_VAR_OTHER_Y - SECT_PADDING * 2) / self.line_height) - 1)
+
+            # Top-left X and Y for other variables section
+            self.ovars_x = self.vars_x
+            self.ovars_y = VID_VAR_OTHER_Y + self.vars_y - self.line_height
+
+            # Columns and rows for other variables section
+            self.ovars_cols = self.vars_cols
+            ovars_h = VID_H - VID_VAR_OTHER_Y
+            self.ovars_rows = int(((ovars_h - SECT_PADDING * 2) / self.line_height) - 1)
 
     def _finish_frame(self):
         # Bail out if there's no frame to finish
@@ -127,7 +150,7 @@ class VideoWriter(Writer):
 
         # Draw variable state (if available)
         if self.last_var is not None:
-            self._draw_variable(self.last_var)
+            self._draw_variables(self.last_var)
 
         # Convert PIL -> Numpy array and RGBA -> BGR colors
         cv_img = cv2.cvtColor(np.asarray(self.frame), cv2.COLOR_RGBA2BGR)
@@ -210,23 +233,34 @@ class VideoWriter(Writer):
 
         self._draw_exec(nr_times, this_time, avg_time, total_time)
 
-    def _draw_variable(self, var):
-        # Draw variable name
-        nw, nh = self.draw.textsize(var.name + " ", font=self.body_font)
-        self.draw.text((self.vars_x, self.vars_y - nh), var.name + " ", fill=CLR_FG_BODY, font=self.body_font)
-        # Draw action with color
-        self.draw.text((self.vars_x + nw, self.vars_y - nh), var.action, fill=var.color, font=self.body_bold_font)
-
-        # Draw remaining text
-        for i, line in enumerate(var.text_lines):
+    def _draw_text_block(self, lines, x_top, y_left):
+        for i, line in enumerate(lines):
             # Calculate line coordinates
-            x = self.vars_x
-            y_top = self.vars_y + self.line_height * (i + 1)
+            x = x_top
+            y_top = y_left + self.line_height * (i + 1)
             y_bottom = y_top - self.line_height
 
             self.draw.text((x, y_bottom), line, fill=CLR_FG_BODY, font=self.body_font)
 
-    def _write_action(self, var, color, action, fields, history):
+    def _draw_last_var(self, state):
+        # Draw variable name
+        nw, nh = self.draw.textsize(state.name + " ", font=self.body_font)
+        self.draw.text((self.vars_x, self.vars_y - nh), state.name + " ", fill=CLR_FG_BODY, font=self.body_font)
+        # Draw action with color
+        self.draw.text((self.vars_x + nw, self.vars_y - nh), state.action, fill=state.color, font=self.body_bold_font)
+
+        # Draw remaining text
+        self._draw_text_block(state.text_lines, self.vars_x, self.vars_y)
+
+    def _draw_other_vars(self, state):
+        # Draw text
+        self._draw_text_block(state.other_text_lines, self.ovars_x, self.ovars_y)
+
+    def _draw_variables(self, state):
+        self._draw_last_var(state)
+        self._draw_other_vars(state)
+
+    def _write_action(self, name, color, action, fields, history):
         # Render fields
         fields_text = "\n".join(f"{field}: {value}" for field, value in fields.items())
 
@@ -242,10 +276,23 @@ class VideoWriter(Writer):
 
         # Render and split full text
         text = fields_text + history_text
-        wrapped_text = wrap_text(text, self.vars_cols, self.vars_rows)
+        wrapped_text = wrap_text(text, int(self.vars_cols), int(self.vars_rows))
+
+        # Render text for "others" section
+        other_vars = []
+        for var, values in history.other_history:
+            var_lines = [var.name + ":"]
+
+            for value in values:
+                var_lines.append(repr(value.value))
+
+            other_vars.append("\n    \u2022 ".join(var_lines))
+
+        others_text = "\n\n".join(other_vars)
+        wrapped_others_text = wrap_text(others_text, int(self.ovars_cols), int(self.ovars_rows))
 
         # Save state; this is drawn when the frame is finished
-        self.last_var = VarState(var, color, action, wrapped_text)
+        self.last_var = VarState(name, color, action, wrapped_text, wrapped_others_text)
 
     def write_add(self, var, val, history, *, action="added", plural):
         self._write_action(var, CLR_GREEN, action, {"Value": repr(val)}, history)
