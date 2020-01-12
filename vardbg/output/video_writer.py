@@ -19,7 +19,7 @@ VID_W = 1280
 VID_H = 720
 VID_VAR_X = 1280 * 2 // 3  # 2/3 code, 1/3 variables
 
-CODE_PADDING = 12
+SECT_PADDING = 12
 LINE_HEIGHT = 1.2
 
 # Material dark colors
@@ -61,8 +61,8 @@ class VideoWriter(Writer):
             w, h = self.draw.textsize("A", font=self.body_font)
 
             self.line_height = h * LINE_HEIGHT
-            self.body_cols = (VID_VAR_X - CODE_PADDING * 2) // w
-            self.body_rows = ((VID_H - CODE_PADDING * 2) / self.line_height) - 1  # Reserve space for caption
+            self.body_cols = (VID_VAR_X - SECT_PADDING * 2) // w
+            self.body_rows = ((VID_H - SECT_PADDING * 2) / self.line_height) - 1  # Reserve space for caption
 
         # Draw variable section
         # Divider at 2/3 width
@@ -124,13 +124,13 @@ class VideoWriter(Writer):
         # Render processed lines
         for i, (line, highlighted) in enumerate(display_lines):
             # Calculate line coordinates
-            x = CODE_PADDING
-            y_top = CODE_PADDING + self.line_height * (i + 1)
+            x = SECT_PADDING
+            y_top = SECT_PADDING + self.line_height * (i + 1)
             y_bottom = y_top - self.line_height
 
             # Draw highlight background if necessary
             if highlighted:
-                x_max = VID_VAR_X - CODE_PADDING
+                x_max = VID_VAR_X - SECT_PADDING
                 self.draw.rectangle(((x, y_top), (x_max, y_bottom)), fill=CLR_HIGHLIGHT)
 
             # Draw text
@@ -142,9 +142,9 @@ class VideoWriter(Writer):
         self._draw_code(frame_info)
 
     def _draw_exec(self, nr_times, cur, avg, total):
-        x = CODE_PADDING
+        x = SECT_PADDING
         # Padding + body
-        y = CODE_PADDING + self.line_height * self.body_rows
+        y = SECT_PADDING + self.line_height * self.body_rows
 
         plural = "" if nr_times == 1 else "s"
         text = f"Line executed {nr_times} time{plural} — current time elapsed: {cur}, average: {avg}, total: {total}"
