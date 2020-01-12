@@ -6,7 +6,7 @@ height = 1080
 fps = 1.5
 
 # Text to display on an intro screen (empty to disable)
-intro_text = "Test Demo Video"
+intro_text = ""
 # Time to show the intro screen, in seconds (ignored if text is empty)
 intro_time = 5
 # Whether to show a watermark in the bottom-right corner
