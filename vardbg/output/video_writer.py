@@ -37,6 +37,26 @@ CLR_BLUE = (0x82, 0xAA, 0xFF, 255)
 VarState = collections.namedtuple("VarState", ("name", "color", "action", "text_lines"))
 
 
+def wrap_text(text, cols, rows):
+    lines = text.split("\n")
+
+    # Wrap text
+    wrapped_lines = []
+    for line in lines:
+        line_wrapped = textwrap.wrap(line, width=cols)
+        if len(line_wrapped) == 0:
+            wrapped_lines.append("")
+        else:
+            wrapped_lines += line_wrapped
+
+    # Truncate rows and add indicator if necessary
+    if len(wrapped_lines) > rows:
+        wrapped_lines = wrapped_lines[:rows]
+        wrapped_lines[-1] = wrapped_lines[-1][: cols - 5] + " [...]"
+
+    return wrapped_lines
+
+
 class VideoWriter(Writer):
     def __init__(self, path):
         # File contents
@@ -222,19 +242,10 @@ class VideoWriter(Writer):
 
         # Render and split full text
         text = fields_text + history_text
-        lines = text.split("\n")
-
-        # Wrap text
-        wrapped_lines = []
-        for line in lines:
-            line_wrapped = textwrap.wrap(line, width=self.vars_cols, max_lines=self.vars_rows)
-            if len(line_wrapped) == 0:
-                wrapped_lines.append("")
-            else:
-                wrapped_lines += line_wrapped
+        wrapped_text = wrap_text(text, self.vars_cols, self.vars_rows)
 
         # Save state; this is drawn when the frame is finished
-        self.last_var = VarState(var, color, action, wrapped_lines)
+        self.last_var = VarState(var, color, action, wrapped_text)
 
     def write_add(self, var, val, history, *, action="added", plural):
         self._write_action(var, CLR_GREEN, action, {"Value": repr(val)}, history)
