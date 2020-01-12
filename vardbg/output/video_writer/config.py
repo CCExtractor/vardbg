@@ -61,6 +61,7 @@ class Config:
         self.bg = tuple(colors["background"])
         self.fg_heading = tuple(colors["heading"])
         self.fg_body = tuple(colors["body"])
+        self.fg_watermark = tuple(colors["watermark"])
         self.highlight = tuple(colors["highlight"])
 
         self.red = tuple(colors["red"])
