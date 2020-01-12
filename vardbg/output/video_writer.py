@@ -31,6 +31,8 @@ CLR_HIGHLIGHT = (0x42, 0x42, 0x42, 255)
 
 class VideoWriter(Writer):
     def __init__(self, path):
+        # File contents
+        self.file_cache = {}
         # Video writer
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
         self.writer = cv2.VideoWriter(path, fourcc, VID_FPS, (VID_W, VID_H))
@@ -80,9 +82,17 @@ class VideoWriter(Writer):
         # Write data
         self.writer.write(cv_img)
 
+    def _get_file_lines(self, path):
+        if path in self.file_cache:
+            return self.file_cache[path]
+
+        lines = Path(path).read_text().splitlines()
+        self.file_cache[path] = lines
+        return lines
+
     def _draw_code(self, frame_info):
         # Read lines and current line index
-        raw_lines = Path(frame_info.file).read_text().splitlines()
+        raw_lines = self._get_file_lines(frame_info.file)
         cur_idx = frame_info.line - 1
         # Construct list of (line, highlighted) tuples
         unwrapped_lines = [(line, i == cur_idx) for i, line in enumerate(raw_lines)]
