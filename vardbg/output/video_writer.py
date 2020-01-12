@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-from .. import data, render
+from .. import render
 from .writer import Writer
 
 FONT_DIR = Path(__file__).parent / ".." / ".." / "fonts"
@@ -235,15 +235,15 @@ class VideoWriter(Writer):
         self.last_var = VarState(var, color, action, wrapped_lines)
 
     def write_add(self, var, val, history, *, action="added", plural):
-        self._write_action(var, CLR_GREEN, action, {"Value": render.val(val)}, history)
+        self._write_action(var, CLR_GREEN, action, {"Value": repr(val)}, history)
 
     def write_change(self, var, val_before, val_after, history, *, action="changed"):
         self._write_action(
-            var, CLR_BLUE, action, {"From": render.val(val_before), "To": render.val(val_after)}, history,
+            var, CLR_BLUE, action, {"From": repr(val_before), "To": repr(val_after)}, history,
         )
 
     def write_remove(self, var, val, history, *, action="removed"):
-        self._write_action(var, CLR_RED, action, {"Last value": render.val(val)}, history)
+        self._write_action(var, CLR_RED, action, {"Last value": repr(val)}, history)
 
     def write_summary(self, var_history, exec_start_time, exec_stop_time, frame_exec_times):
         # Video doesn't have a summary
