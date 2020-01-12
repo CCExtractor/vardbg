@@ -1,3 +1,5 @@
 dictdiffer
 jsonpickle
+opencv-python
+pillow
 sortedcontainers

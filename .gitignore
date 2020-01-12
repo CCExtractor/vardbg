@@ -15,3 +15,6 @@ __pycache__/
 
 # Debug output
 *.json
+
+# Video output
+*.mp4

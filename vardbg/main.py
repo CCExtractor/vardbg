@@ -11,13 +11,23 @@ def parse_args():
     )
 
     parser.add_argument("-f", "--file", nargs="?", type=str, help="Python file to debug, or JSON result file to read")
-    parser.add_argument("-n", "--function", nargs="?", type=str, help="function to run from the given file")
+    parser.add_argument(
+        "-n", "--function", nargs="?", type=str, help="function to run from the given file (if applicable)"
+    )
     parser.add_argument(
         "-o",
         "--output-file",
         nargs="?",
         default="debug_results.json",
         help="Path to write JSON output file to, default debug_results.json (will be truncated if it already exists and created otherwise)",
+    )
+    parser.add_argument(
+        "-v",
+        "--video",
+        nargs="?",
+        type=str,
+        metavar="PATH",
+        help="Path to write a MP4 video representation of the program execution to",
     )
     parser.add_argument(
         "-a",
@@ -58,14 +68,15 @@ def do_debug(args, mod):
     debugger.debug(
         func,
         relative_paths=not args.absolute_paths,
-        json_output_path=args.output_file,
+        json_out_path=args.output_file,
+        video_out_path=args.video,
         live_profiler_output=not args.disable_live_profiler,
     )
     return 0
 
 
 def do_replay(args):
-    debugger.replay(args.file)
+    debugger.replay(args.file, video_out_path=args.video)
 
 
 def main():

@@ -6,7 +6,7 @@ from .tracer import Tracer
 
 
 class Debugger(DiffProcessor, Profiler, Replayer, Tracer):
-    def __init__(self, relative_paths=True, json_output_path=None, live_profiler_output=True):
+    def __init__(self, relative_paths=True, json_out_path=None, video_out_path=None, live_profiler_output=True):
         # Whether to use relative paths over absolute ones in output
         self.use_relative_paths = relative_paths
 
@@ -15,8 +15,10 @@ class Debugger(DiffProcessor, Profiler, Replayer, Tracer):
 
         # Output writers
         writers = [output.ConsoleWriter()]
-        if json_output_path is not None:
-            writers.append(output.JsonWriter(json_output_path))
+        if json_out_path is not None:
+            writers.append(output.JsonWriter(json_out_path))
+        if video_out_path is not None:
+            writers.append(output.VideoWriter(video_out_path))
         self.out = output.OutputDelegate(*writers)
 
         # Initialize mixins
