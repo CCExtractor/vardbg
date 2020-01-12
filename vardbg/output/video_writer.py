@@ -22,7 +22,7 @@ VID_H = 1080
 VID_VAR_X = VID_W * 2 // 3  # 2/3 code, 1/3 variables
 
 HEADER_PADDING = 36
-SECT_PADDING = 12
+SECT_PADDING = 20
 LINE_HEIGHT = 1.2
 
 # Material dark colors
