@@ -1,34 +1,10 @@
 import textwrap
-from pathlib import Path
 
 import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-FONT_DIR = Path(__file__).parent / ".." / ".." / ".." / "fonts"
-FONT_BODY = (str(FONT_DIR / "FiraMono-Regular.ttf"), 16)
-FONT_BODY_BOLD = (str(FONT_DIR / "FiraMono-Bold.ttf"), 16)
-FONT_CAPTION = (str(FONT_DIR / "Inter-Regular.ttf"), 16)
-FONT_HEAD = (str(FONT_DIR / "Inter-Regular.ttf"), 24)
-
-VID_FPS = 1.5
-VID_W = 1920
-VID_H = 1080
-VID_VAR_X = VID_W * 2 // 3  # 2/3 code, 1/3 variables
-VID_VAR_OTHER_Y = VID_H * 1 // 4  # 1/4 last variable, 3/4 other variables
-
-HEADER_PADDING = 20
-SECT_PADDING = 20
-LINE_HEIGHT = 1.2
-
-# Material dark colors
-CLR_BG = (0x12, 0x12, 0x12, 255)
-CLR_FG_HEADING = (0xFF, 0xFF, 0xFF, 255)
-CLR_FG_BODY = (0xFF, 0xFF, 0xFF, 255 * 70 // 100)  # 70% opacity
-CLR_HIGHLIGHT = (0x42, 0x42, 0x42, 255)
-CLR_RED = (0xF7, 0x8C, 0x6C, 255)
-CLR_GREEN = (0xC3, 0xE8, 0x8D, 255)
-CLR_BLUE = (0x82, 0xAA, 0xFF, 255)
+from .config import Config
 
 
 class FrameRenderer:
@@ -37,17 +13,19 @@ class FrameRenderer:
     BLUE = 2
 
     # noinspection PyUnresolvedReferences
-    def __init__(self, path, config):
+    def __init__(self, path, config_path):
+        # Config
+        self.cfg = Config(config_path)
         # Video writer
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-        self.writer = cv2.VideoWriter(path, fourcc, VID_FPS, (VID_W, VID_H))
+        self.writer = cv2.VideoWriter(path, fourcc, self.cfg.fps, (self.cfg.w, self.cfg.h))
         # Drawing context
         self.draw = None
         # Fonts
-        self.body_font = ImageFont.truetype(*FONT_BODY)
-        self.body_bold_font = ImageFont.truetype(*FONT_BODY_BOLD)
-        self.caption_font = ImageFont.truetype(*FONT_CAPTION)
-        self.head_font = ImageFont.truetype(*FONT_HEAD)
+        self.body_font = ImageFont.truetype(*self.cfg.font_body)
+        self.body_bold_font = ImageFont.truetype(*self.cfg.font_body_bold)
+        self.caption_font = ImageFont.truetype(*self.cfg.font_caption)
+        self.head_font = ImageFont.truetype(*self.cfg.font_heading)
         # Code body size (to be calculated later)
         self.line_height = None
         self.body_cols = None
@@ -65,14 +43,13 @@ class FrameRenderer:
         # Current video frame (image)
         self.frame = None
 
-    @classmethod
-    def get_color(cls, col):
-        if col == cls.RED:
-            return CLR_RED
-        elif col == cls.GREEN:
-            return CLR_GREEN
+    def get_color(self, col):
+        if col == self.RED:
+            return self.cfg.red
+        elif col == self.GREEN:
+            return self.cfg.green
         else:
-            return CLR_BLUE
+            return self.cfg.blue
 
     def draw_text_center(self, x, y, text, font, color):
         w, h = self.draw.textsize(text, font=font)
@@ -80,51 +57,53 @@ class FrameRenderer:
 
     def start_frame(self):
         # Create image
-        self.frame = Image.new("RGBA", (VID_W, VID_H), CLR_BG)
+        self.frame = Image.new("RGBA", (self.cfg.w, self.cfg.h), self.cfg.bg)
         # Create drawing context
         self.draw = ImageDraw.Draw(self.frame)
         # Calculate code box size (if necessary)
         if self.line_height is None:
             w, h = self.draw.textsize("A", font=self.body_font)
 
-            self.line_height = h * LINE_HEIGHT
-            self.body_cols = (VID_VAR_X - SECT_PADDING * 2) // w
-            self.body_rows = ((VID_H - SECT_PADDING * 2) / self.line_height) - 1  # Reserve space for caption
+            self.line_height = h * self.cfg.line_height
+            self.body_cols = (self.cfg.var_x - self.cfg.sect_padding * 2) // w
+            self.body_rows = ((self.cfg.h - self.cfg.sect_padding * 2) / self.line_height) - 1
 
         # Draw variable section
         # Vertical divider at 2/3 width
-        self.draw.line(((VID_VAR_X, 0), (VID_VAR_X, VID_H)), fill=CLR_FG_BODY, width=1)
+        self.draw.line(((self.cfg.var_x, 0), (self.cfg.var_x, self.cfg.h)), fill=self.cfg.fg_body, width=1)
         # Label horizontally centered in the variable section and vertically padded
-        var_center_x = VID_VAR_X + ((VID_W - VID_VAR_X) / 2)
-        self.draw_text_center(var_center_x, HEADER_PADDING, "Last Variable", self.head_font, CLR_FG_HEADING)
+        var_center_x = self.cfg.var_x + ((self.cfg.w - self.cfg.var_x) / 2)
+        self.draw_text_center(var_center_x, self.cfg.head_padding, "Last Variable", self.head_font, self.cfg.fg_heading)
 
         # Draw other variables section
         # Horizontal divider at 1/3 height
-        self.draw.line(((VID_VAR_X, VID_VAR_OTHER_Y), (VID_W, VID_VAR_OTHER_Y)), fill=CLR_FG_BODY, width=1)
+        self.draw.line(
+            ((self.cfg.var_x, self.cfg.ovar_y), (self.cfg.w, self.cfg.ovar_y)), fill=self.cfg.fg_body, width=1
+        )
         # Label similar to the first, but in the others section instead
-        ovar_label_y = VID_VAR_OTHER_Y + HEADER_PADDING
-        self.draw_text_center(var_center_x, ovar_label_y, "Other Variables", self.head_font, CLR_FG_HEADING)
+        ovar_label_y = self.cfg.ovar_y + self.cfg.head_padding
+        self.draw_text_center(var_center_x, ovar_label_y, "Other Variables", self.head_font, self.cfg.fg_heading)
 
         # Save variable body start positions and sizes (if necessary)
         if self.vars_x is None:
             # Top-left X and Y for last variable section
-            self.vars_x = VID_VAR_X + SECT_PADDING
+            self.vars_x = self.cfg.var_x + self.cfg.sect_padding
             hw, hh = self.draw.textsize("A", font=self.head_font)
-            self.vars_y = HEADER_PADDING * 2 + hh
+            self.vars_y = self.cfg.head_padding * 2 + hh
 
             # Columns and rows for last variable section
             vw, vh = self.draw.textsize("A", font=self.body_font)
-            self.vars_cols = (VID_W - VID_VAR_X - SECT_PADDING * 2) // vw
-            self.vars_rows = int(((VID_VAR_OTHER_Y - SECT_PADDING * 2) / self.line_height) - 1)
+            self.vars_cols = (self.cfg.w - self.cfg.var_x - self.cfg.sect_padding * 2) // vw
+            self.vars_rows = int(((self.cfg.ovar_y - self.cfg.sect_padding * 2) / self.line_height) - 1)
 
             # Top-left X and Y for other variables section
             self.ovars_x = self.vars_x
-            self.ovars_y = VID_VAR_OTHER_Y + self.vars_y - self.line_height
+            self.ovars_y = self.cfg.ovar_y + self.vars_y - self.line_height
 
             # Columns and rows for other variables section
             self.ovars_cols = self.vars_cols
-            ovars_h = VID_H - VID_VAR_OTHER_Y
-            self.ovars_rows = int(((ovars_h - SECT_PADDING * 2) / self.line_height) - 1)
+            ovars_h = self.cfg.h - self.cfg.ovar_y
+            self.ovars_rows = int(((ovars_h - self.cfg.sect_padding * 2) / self.line_height) - 1)
 
     def finish_frame(self, var_state):
         # Bail out if there's no frame to finish
@@ -174,22 +153,22 @@ class FrameRenderer:
         # Render processed lines
         for i, (line, highlighted) in enumerate(display_lines):
             # Calculate line coordinates
-            x = SECT_PADDING
-            y_top = SECT_PADDING + self.line_height * (i + 1)
+            x = self.cfg.sect_padding
+            y_top = self.cfg.sect_padding + self.line_height * (i + 1)
             y_bottom = y_top - self.line_height
 
             # Draw highlight background if necessary
             if highlighted:
-                x_max = VID_VAR_X - SECT_PADDING
-                self.draw.rectangle(((x, y_top), (x_max, y_bottom)), fill=CLR_HIGHLIGHT)
+                x_max = self.cfg.var_x - self.cfg.sect_padding
+                self.draw.rectangle(((x, y_top), (x_max, y_bottom)), fill=self.cfg.highlight)
 
             # Draw text
             self.draw.text((x, y_bottom), line, font=self.body_font)
 
     def draw_exec(self, nr_times, cur, avg, total):
-        x = SECT_PADDING
+        x = self.cfg.sect_padding
         # Padding + body
-        y = SECT_PADDING + self.line_height * self.body_rows
+        y = self.cfg.sect_padding + self.line_height * self.body_rows
 
         plural = "" if nr_times == 1 else "s"
         text = f"Line executed {nr_times} time{plural} — current time elapsed: {cur}, average: {avg}, total: {total}"
@@ -202,12 +181,12 @@ class FrameRenderer:
             y_top = y_left + self.line_height * (i + 1)
             y_bottom = y_top - self.line_height
 
-            self.draw.text((x, y_bottom), line, fill=CLR_FG_BODY, font=self.body_font)
+            self.draw.text((x, y_bottom), line, fill=self.cfg.fg_body, font=self.body_font)
 
     def draw_last_var(self, state):
         # Draw variable name
         nw, nh = self.draw.textsize(state.name + " ", font=self.body_font)
-        self.draw.text((self.vars_x, self.vars_y - nh), state.name + " ", fill=CLR_FG_BODY, font=self.body_font)
+        self.draw.text((self.vars_x, self.vars_y - nh), state.name + " ", fill=self.cfg.fg_body, font=self.body_font)
         # Draw action with color
         self.draw.text((self.vars_x + nw, self.vars_y - nh), state.action, fill=state.color, font=self.body_bold_font)
 

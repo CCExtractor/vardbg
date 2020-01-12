@@ -3,3 +3,4 @@ jsonpickle
 opencv-python
 pillow
 sortedcontainers
+toml

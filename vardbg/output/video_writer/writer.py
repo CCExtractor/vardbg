@@ -31,7 +31,7 @@ def wrap_text(text, cols, rows):
 
 
 class VideoWriter(Writer):
-    def __init__(self, path, config):
+    def __init__(self, path, config_path):
         # File contents
         self.file_cache = {}
         # Current stack frame snapshot (info)
@@ -39,7 +39,7 @@ class VideoWriter(Writer):
         # Last variable state
         self.last_var = None
         # Frame renderer
-        self.render = FrameRenderer(path, config)
+        self.render = FrameRenderer(path, config_path)
 
     def get_file_lines(self, path):
         if path in self.file_cache:

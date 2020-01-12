@@ -1,0 +1,55 @@
+[general]
+# Video width and height in pixels
+width = 1920
+height = 1080
+# Frames per second, higher is faster (can be fractional)
+fps = 1.5
+
+# Text to display on an intro screen (empty to disable)
+intro_text = ""
+# Whether to show a watermark in the bottom-right corner
+watermark = true
+
+[sizes]
+# These are fractions of the full sizes
+code_width = [2, 3]
+last_variable_height = [1, 4]
+
+# Padding
+heading_padding = 20
+section_padding = 20
+
+# Line height (multiplier of the font size)
+line_height = 1.2
+
+[fonts]
+# Paths that start with $VARDBG are relative to the debugger's root directory
+# Sizes are in pixels
+
+# Font used for the main code body (including a bold version)
+body = "$VARDBG/fonts/FiraMono-Regular.ttf"
+body_bold = "$VARDBG/fonts/FiraMono-Bold.ttf"
+body_size = 16
+
+# Caption font, used to show execution times below the code as well as the watermark
+caption = "$VARDBG/fonts/Inter-Regular.ttf"
+caption_size = 16
+
+# Heading font, used to show headings in the variable sections
+heading = "$VARDBG/fonts/Inter-Regular.ttf"
+heading_size = 24
+
+[colors]
+# These are RGBA color tuples
+# Default colors are Material Dark
+
+# General colors
+background = [0x12, 0x12, 0x12, 0xFF]
+heading = [0xFF, 0xFF, 0xFF, 0xFF]
+body = [0xFF, 0xFF, 0xFF, 0xB2]
+highlight = [0x42, 0x42, 0x42, 0xFF]
+
+# Color accents
+red = [0xF7, 0x8C, 0x6C, 0xFF]
+green = [0xC3, 0xE8, 0x8D, 0xFF]
+blue = [0x82, 0xAA, 0xFF, 0xFF]
