@@ -58,7 +58,7 @@ class VideoWriter(Writer):
 
             self.line_height = h * LINE_HEIGHT
             self.body_cols = (VID_VAR_X - CODE_PADDING * 2) // w
-            self.body_rows = (VID_H - CODE_PADDING * 2) // h
+            self.body_rows = (VID_H - CODE_PADDING * 2) / self.line_height
 
         # Draw variable section
         # Divider at 2/3 width
@@ -96,9 +96,22 @@ class VideoWriter(Writer):
                 for line_seg in line_wrapped:
                     wrapped_lines.append((line_seg, highlighted))
 
-        # Find section to display (leave max equivalent number of context lines on each side)
-        ctx_side_lines = self.body_rows // 2 - 4
-        display_lines = wrapped_lines[max(0, cur_idx - ctx_side_lines) : cur_idx + ctx_side_lines]
+        # Calculate start and end display indexes with an equivalent number of lines on both sides for context
+        ctx_side_lines = self.body_rows / 2 - 1
+        start_idx = round(cur_idx - ctx_side_lines)
+        end_idx = round(cur_idx + ctx_side_lines)
+        # Accommodate for situations where not enough lines are available at the beginning
+        if start_idx < 0:
+            start_extra = abs(start_idx)
+            end_idx += start_extra
+            start_idx = 0
+        # Add 1 to accommodate for even side line counts
+        if round(ctx_side_lines) % 2 == 0:
+            end_idx += 1
+        # Truncate end index to max
+        end_idx = min(end_idx, len(wrapped_lines) - 1)
+        # Slice selected section
+        display_lines = wrapped_lines[start_idx:end_idx]
 
         # Render processed lines
         for i, (line, highlighted) in enumerate(display_lines):
