@@ -210,7 +210,7 @@ class VideoWriter(Writer):
         # Render fields
         fields_text = "\n".join(f"{field}: {value}" for field, value in fields.items())
 
-        if history:
+        if history and history.var_history:
             values = ["\n\nHistory:"]
 
             for value in history.var_history:
