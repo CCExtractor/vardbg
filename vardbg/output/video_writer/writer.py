@@ -7,10 +7,10 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-from .. import render
-from .writer import Writer
+from ... import render
+from ..writer import Writer
 
-FONT_DIR = Path(__file__).parent / ".." / ".." / "fonts"
+FONT_DIR = Path(__file__).parent / ".." / ".." / ".." / "fonts"
 FONT_BODY = (str(FONT_DIR / "FiraMono-Regular.ttf"), 16)
 FONT_BODY_BOLD = (str(FONT_DIR / "FiraMono-Bold.ttf"), 16)
 FONT_CAPTION = (str(FONT_DIR / "Inter-Regular.ttf"), 16)
@@ -59,7 +59,7 @@ def wrap_text(text, cols, rows):
 
 
 class VideoWriter(Writer):
-    def __init__(self, path):
+    def __init__(self, path, config):
         # File contents
         self.file_cache = {}
         # Video writer

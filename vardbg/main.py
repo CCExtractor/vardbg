@@ -30,6 +30,14 @@ def parse_args():
         help="Path to write a MP4 video representation of the program execution to",
     )
     parser.add_argument(
+        "-c",
+        "--video-config",
+        nargs="?",
+        default="video.toml",
+        metavar="CONFIG",
+        help="Path to the TOML config for the video output format",
+    )
+    parser.add_argument(
         "-a",
         "--absolute-paths",
         default=False,
@@ -70,13 +78,14 @@ def do_debug(args, mod):
         relative_paths=not args.absolute_paths,
         json_out_path=args.output_file,
         video_out_path=args.video,
+        video_config=args.video_config,
         live_profiler_output=not args.disable_live_profiler,
     )
     return 0
 
 
 def do_replay(args):
-    debugger.replay(args.file, video_out_path=args.video)
+    debugger.replay(args.file, video_out_path=args.video, video_config=args.video_config)
 
 
 def main():
