@@ -16,7 +16,7 @@ FONT_BODY_BOLD = (str(FONT_DIR / "FiraMono-Bold.ttf"), 16)
 FONT_CAPTION = (str(FONT_DIR / "Inter-Regular.ttf"), 16)
 FONT_HEAD = (str(FONT_DIR / "Inter-Regular.ttf"), 24)
 
-VID_FPS = 1
+VID_FPS = 1.5
 VID_W = 1920
 VID_H = 1080
 VID_VAR_X = VID_W * 2 // 3  # 2/3 code, 1/3 variables
