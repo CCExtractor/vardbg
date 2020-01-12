@@ -12,6 +12,7 @@ from .writer import Writer
 
 FONT_DIR = Path(__file__).parent / ".." / ".." / "fonts"
 FONT_BODY = (str(FONT_DIR / "FiraMono-Regular.ttf"), 16)
+FONT_BODY_BOLD = (str(FONT_DIR / "FiraMono-Bold.ttf"), 16)
 FONT_CAPTION = (str(FONT_DIR / "Inter-Regular.ttf"), 16)
 FONT_HEAD = (str(FONT_DIR / "Inter-Regular.ttf"), 32)
 
@@ -45,6 +46,7 @@ class VideoWriter(Writer):
         self.writer = cv2.VideoWriter(path, fourcc, VID_FPS, (VID_W, VID_H))
         # Fonts
         self.body_font = ImageFont.truetype(*FONT_BODY)
+        self.body_bold_font = ImageFont.truetype(*FONT_BODY_BOLD)
         self.caption_font = ImageFont.truetype(*FONT_CAPTION)
         self.head_font = ImageFont.truetype(*FONT_HEAD)
         # Code body size (to be calculated later)
@@ -193,7 +195,7 @@ class VideoWriter(Writer):
         nw, nh = self.draw.textsize(var.name + " ", font=self.body_font)
         self.draw.text((self.vars_x, self.vars_y - nh), var.name + " ", fill=CLR_FG_BODY, font=self.body_font)
         # Draw action with color
-        self.draw.text((self.vars_x + nw, self.vars_y - nh), var.action, fill=var.color, font=self.body_font)
+        self.draw.text((self.vars_x + nw, self.vars_y - nh), var.action, fill=var.color, font=self.body_bold_font)
 
         # Draw remaining text
         for i, line in enumerate(var.text_lines):
