@@ -135,6 +135,9 @@ class Tracer(abc.ABC):
         sys.argv = old_args
         sys.stdout = real_stdout
 
+        # Finalize variable history
+        self.finalize_history()
+
         # Write summary with collected data
         self.out.write_summary(self.vars, self.exec_start_time, self.exec_stop_time, self.frame_exec_times)
         return ret

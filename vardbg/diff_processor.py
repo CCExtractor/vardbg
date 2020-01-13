@@ -1,4 +1,5 @@
 import abc
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import dictdiffer
@@ -14,11 +15,24 @@ class DiffProcessor(abc.ABC):
         # Full variable + values map
         self.vars = {}
 
+        # File contents cache
+        self.file_cache = {}
+
         # Propagate initialization to other mixins
         super().__init__()
 
     def _get_history(self, wrapper):
         return data.VarHistory(wrapper, self.vars)
+
+    def _get_line(self, frame_info):
+        # Read lines from cache if possible, otherwise read from file and save to cache
+        try:
+            lines = self.file_cache[frame_info.file]
+        except KeyError:
+            lines = Path(frame_info.file).read_text().replace("\r", "").splitlines()
+            self.file_cache[frame_info.file] = lines
+
+        return lines[frame_info.line - 1]
 
     def process_add(self: "Debugger", chg_name, chg, frame_info, new_locals):
         # If we have a changed variable, elements were added to a list/set/dict
@@ -28,31 +42,36 @@ class DiffProcessor(abc.ABC):
             # Construct variable wrapper
             wrapper = data.Variable(chg_name, frame_info)
 
-            # chg is a list of tuples with keys (index, key, etc.) and values
-            for key, val in chg:
-                if isinstance(container, set):
-                    # Move value out of set if there's only 1
-                    if len(val) == 1:
-                        val = val.pop()
+            if not self.vars[wrapper].ignored:
+                # chg is a list of tuples with keys (index, key, etc.) and values
+                for key, val in chg:
+                    if isinstance(container, set):
+                        # Move value out of set if there's only 1
+                        if len(val) == 1:
+                            val = val.pop()
 
-                    # Show it as an extension for sets
-                    self.out.write_add(
-                        chg_name, val, self._get_history(wrapper), action="extended", plural=isinstance(val, set)
-                    )
-                else:
-                    # Render it as var[key] for lists, dicts, etc.
-                    self.out.write_add(render.key_var(chg_name, key), val, self._get_history(wrapper))
+                        # Show it as an extension for sets
+                        self.out.write_add(
+                            chg_name, val, self._get_history(wrapper), action="extended", plural=isinstance(val, set)
+                        )
+                    else:
+                        # Render it as var[key] for lists, dicts, etc.
+                        self.out.write_add(render.key_var(chg_name, key), val, self._get_history(wrapper))
 
-            # Record new value
-            self.vars[wrapper].append(data.VarValue(container, frame_info))
+                # Record new value
+                self.vars[wrapper].append(data.VarValue(container, frame_info))
 
         # Otherwise, it's a new variable
         else:
             # chg is a list of tuples with variable names and values
             for name, val in chg:
                 wrapper = data.Variable(name, frame_info)
-                self.out.write_add(name, val, self._get_history(wrapper))
-                self.vars[wrapper] = [data.VarValue(val, frame_info)]
+                ignored = self._get_line(frame_info).endswith("# vardbg: ignore")
+                if ignored:
+                    self.vars[wrapper] = data.VarValues(ignored=True)
+                else:
+                    self.out.write_add(name, val, self._get_history(wrapper))
+                    self.vars[wrapper] = data.VarValues(data.VarValue(val, frame_info))
 
     def process_change(self: "Debugger", chg_name, chg, frame_info, new_locals):
         before, after = chg
@@ -71,8 +90,9 @@ class DiffProcessor(abc.ABC):
             full_after = after
 
         wrapper = data.Variable(var_name, frame_info)
-        self.out.write_change(chg_name, before, after, self._get_history(wrapper))
-        self.vars[wrapper].append(data.VarValue(full_after, frame_info))
+        if not self.vars[wrapper].ignored:
+            self.out.write_change(chg_name, before, after, self._get_history(wrapper))
+            self.vars[wrapper].append(data.VarValue(full_after, frame_info))
 
     def process_remove(self: "Debugger", chg_name, chg, frame_info, new_locals):
         # If we have a changed variable, elements were removed from a list/set/dict
@@ -80,12 +100,13 @@ class DiffProcessor(abc.ABC):
             # Construct variable wrapper
             wrapper = data.Variable(chg_name, frame_info)
 
-            for key, val in chg:
-                self.out.write_remove(render.key_var(chg_name, key), val, self._get_history(wrapper))
+            if not self.vars[wrapper].ignored:
+                for key, val in chg:
+                    self.out.write_remove(render.key_var(chg_name, key), val, self._get_history(wrapper))
 
-            # Get new container contents and log value
-            container = new_locals[chg_name]
-            self.vars[wrapper].append(data.VarValue(container, frame_info))
+                # Get new container contents and log value
+                container = new_locals[chg_name]
+                self.vars[wrapper].append(data.VarValue(container, frame_info))
 
         # Otherwise, a variable was deleted
         else:
@@ -94,11 +115,9 @@ class DiffProcessor(abc.ABC):
                 # Construct variable wrapper
                 wrapper = data.Variable(name, frame_info)
 
-                self.out.write_remove(name, val, self._get_history(wrapper), action="deleted")
-
-                # Find existing equivalent wrapper object
-                var = list(filter(lambda v: v == wrapper, self.vars.keys()))[0]
-                var.deleted_line = frame_info.file_line
+                if not self.vars[wrapper].ignored:
+                    self.out.write_remove(name, val, self._get_history(wrapper), action="deleted")
+                    self.vars[wrapper].deleted_line = frame_info.file_line
 
     def process_locals_diff(self: "Debugger", diff, frame_info, new_locals):
         for action, chg_var, chg in diff:
@@ -108,3 +127,9 @@ class DiffProcessor(abc.ABC):
                 self.process_change(chg_var, chg, frame_info, new_locals)
             elif action == dictdiffer.REMOVE:
                 self.process_remove(chg_var, chg, frame_info, new_locals)
+
+    def finalize_history(self: "Debugger"):
+        # Delete ignored variables (implementation detail) from history map
+        to_delete = [var for var, values in self.vars.items() if values.ignored]
+        for var in to_delete:
+            del self.vars[var]

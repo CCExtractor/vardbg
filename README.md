@@ -54,3 +54,9 @@ optional arguments:
   -P, --disable-live-profiler
                         disable live profiler output during execution
 ```
+
+## Comments
+
+Special comments can be added to lines of code that define variables to control how vardbg handles said variable:
+
+- `# vardbg: ignore` — do not display this variable or track its values

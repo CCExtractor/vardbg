@@ -78,8 +78,8 @@ class ConsoleWriter(Writer):
             definition = f"in {var.function} on {ansi.bold(var.file_line)}"
             self.print(f"  - {ansi.bold(var.name)} {ansi.green('defined')} {definition} with values{values_desc}")
 
-            if var.deleted_line is not None:
-                self.print(f"    ({ansi.red('deleted')} on {var.deleted_line})")
+            if values.deleted_line is not None:
+                self.print(f"    ({ansi.red('deleted')} on {values.deleted_line})")
 
     def _write_line_summary(self, frame_exec_times):
         self.print()

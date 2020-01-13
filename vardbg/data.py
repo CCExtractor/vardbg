@@ -21,7 +21,6 @@ class Variable:
     def __init__(self, name, frame_info):
         # Basic variable info
         self.name = name
-        self.deleted_line = None  # file:line
 
         # Extract info from frame
         self._file = frame_info.file
@@ -41,6 +40,13 @@ class Variable:
 
     def __ne__(self, other):
         return not (self == other)
+
+
+class VarValues(list):
+    def __init__(self, *values, ignored=False):
+        super().__init__(values)
+        self.ignored = ignored
+        self.deleted_line = None  # file:line
 
 
 class VarValue:

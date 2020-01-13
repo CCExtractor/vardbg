@@ -23,6 +23,9 @@ def test_func():  # sourcery off
     x *= 2
     print("x =", x)
 
+    # Hidden variable
+    c = 1  # vardbg: ignore
+
     # List modification
     # noinspection PyListCreation
     lst = [1]
