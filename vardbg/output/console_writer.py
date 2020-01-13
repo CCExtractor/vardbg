@@ -1,13 +1,19 @@
 import statistics
+import sys
 
 from .. import ansi, data, render
 from .writer import Writer
 
 
 class ConsoleWriter(Writer):
-    def __init__(self):
+    def __init__(self, file=None):
+        # Output fd
+        self.file = file or sys.stdout
         # Current line output prefix
         self.cur_line = ""
+
+    def print(self, *args, **kwargs):
+        print(*args, **kwargs, file=self.file)
 
     def write_cur_frame(self, frame_info):
         # Construct friendly filename + line number + function string
@@ -20,10 +26,10 @@ class ConsoleWriter(Writer):
         total_time = render.duration_ns(sum(exec_times))
         this_time = render.duration_ns(exec_time)
 
-        print(f"{self.cur_line} | exec {nr_times}x (time: {this_time}, avg {avg_time}, total {total_time})")
+        self.print(f"{self.cur_line} | exec {nr_times}x (time: {this_time}, avg {avg_time}, total {total_time})")
 
     def _write_action(self, var, color_func, action, suffix):
-        print(f"{self.cur_line} | {ansi.bold(var)} {color_func(action)} {suffix}")
+        self.print(f"{self.cur_line} | {ansi.bold(var)} {color_func(action)} {suffix}")
 
     def write_add(self, var, val, history, *, action="added", plural=False):
         _plural = "s" if plural else ""
@@ -37,10 +43,9 @@ class ConsoleWriter(Writer):
     def write_remove(self, var, val, history, *, action="removed"):
         self._write_action(var, ansi.red, action, f"(value: {render.val(val)})")
 
-    @staticmethod
-    def _write_var_summary(var_history):
-        print()
-        print("Variables seen:")
+    def _write_var_summary(self, var_history):
+        self.print()
+        self.print("Variables seen:")
 
         for var, values in var_history.items():
             # Check whether all the values were numbers
@@ -63,15 +68,14 @@ class ConsoleWriter(Writer):
                 values_desc = "\n      - ".join(value_lines)
 
             definition = f"in {var.function} on {ansi.bold(var.file_line)}"
-            print(f"  - {ansi.bold(var.name)} {ansi.green('defined')} {definition} with values{values_desc}")
+            self.print(f"  - {ansi.bold(var.name)} {ansi.green('defined')} {definition} with values{values_desc}")
 
             if var.deleted_line is not None:
-                print(f"    ({ansi.red('deleted')} on {var.deleted_line})")
+                self.print(f"    ({ansi.red('deleted')} on {var.deleted_line})")
 
-    @staticmethod
-    def _write_line_summary(frame_exec_times):
-        print()
-        print("Lines executed:")
+    def _write_line_summary(self, frame_exec_times):
+        self.print()
+        self.print("Lines executed:")
 
         for frame_info, exec_times in frame_exec_times.items():
             nr_times = len(exec_times)
@@ -79,14 +83,15 @@ class ConsoleWriter(Writer):
             total_time = render.duration_ns(sum(exec_times))
 
             file_line = "%s:%-2d (%s)" % (frame_info.file, frame_info.line, frame_info.function)
-            print(f"{file_line} | {ansi.bold(nr_times)}x, avg {ansi.bold(avg_time)}, total {ansi.bold(total_time)}")
+            self.print(
+                f"{file_line} | {ansi.bold(nr_times)}x, avg {ansi.bold(avg_time)}, total {ansi.bold(total_time)}"
+            )
 
-    @staticmethod
-    def _write_time_summary(exec_start_time, exec_stop_time):
-        print()
+    def _write_time_summary(self, exec_start_time, exec_stop_time):
+        self.print()
 
         exec_time = render.duration_ns(exec_stop_time - exec_start_time)
-        print(f"Total execution time: {ansi.bold(exec_time)}")
+        self.print(f"Total execution time: {ansi.bold(exec_time)}")
 
     def write_summary(self, var_history, exec_start_time, exec_stop_time, frame_exec_times):
         self._write_var_summary(var_history)
