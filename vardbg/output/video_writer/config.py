@@ -25,6 +25,11 @@ def sub_path(path):
     return path
 
 
+def calc_frac(value, frac):
+    num, denom = frac
+    return round(value * num / denom)
+
+
 class Config:
     def __init__(self, config_path):
         # Load config
@@ -42,10 +47,8 @@ class Config:
         self.watermark = general["watermark"]
 
         sizes = self.config["sizes"]
-        cw_frac = sizes["code_width"]
-        self.var_x = round(self.w * cw_frac[0] / cw_frac[1])
-        lv_frac = sizes["last_variable_height"]
-        self.ovar_y = round(self.h * lv_frac[0] / lv_frac[1])
+        self.var_x = calc_frac(self.w, sizes["code_width"])
+        self.ovar_y = calc_frac(self.h, sizes["last_variable_height"])
 
         self.head_padding = sizes["heading_padding"]
         self.sect_padding = sizes["section_padding"]
