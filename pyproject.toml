@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "vardbg"
+version = "0.9.1"
+description = "A simple Python debugger and profiler that generates animated visualizations of program flow."
+authors = ["Danny Lin <danny@kdrag0n.dev>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/CCExtractor/vardbg"
+documentation = "https://github.com/CCExtractor/vardbg/blob/master/README.md"
+
+# Search info
+keywords = ["debug", "debugger", "visualization"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Debuggers"
+]
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/CCExtractor/vardbg/issues"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+dictdiffer = "^0.8.1"
+jsonpickle = "^1.2"
+opencv-python = "^4.1.2"
+pillow = "^7.0.0"
+sortedcontainers = "^2.1.0"
+toml = "^0.10.0"
+
+[tool.poetry.dev-dependencies]
+black = "^19.10b0"
+
+[tool.poetry.scripts]
+pyrobud = "vardbg.main:main"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
