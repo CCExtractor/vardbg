@@ -19,7 +19,7 @@ def parse_args():
         "--output-file",
         nargs="?",
         default="debug_results.json",
-        help="Path to write JSON output file to, default debug_results.json (will be truncated if it already exists and created otherwise)",
+        help="path to write JSON output file to, default debug_results.json (will be truncated if it already exists and created otherwise)",
     )
     parser.add_argument(
         "-v",
@@ -27,7 +27,7 @@ def parse_args():
         nargs="?",
         type=str,
         metavar="PATH",
-        help="Path to write a MP4 video representation of the program execution to",
+        help="path to write a video representation of the program execution to (MP4 and GIF formats are supported, depending on file extension)",
     )
     parser.add_argument(
         "-c",
@@ -35,21 +35,21 @@ def parse_args():
         nargs="?",
         default="video.toml",
         metavar="CONFIG",
-        help="Path to the TOML config for the video output format",
+        help="path to the TOML config for the video output format, default video.toml",
     )
     parser.add_argument(
         "-a",
         "--absolute-paths",
         default=False,
         action="store_true",
-        help="whether to use absolute paths instead of relative ones",
+        help="use absolute paths instead of relative ones",
     )
     parser.add_argument(
         "-P",
         "--disable-live-profiler",
         default=False,
         action="store_true",
-        help="whether to disable live profiler output during execution",
+        help="disable live profiler output during execution",
     )
 
     return parser.parse_args()
