@@ -38,7 +38,10 @@ def parse_args():
         help="path to the TOML config for the video output format, default video.toml",
     )
     parser.add_argument(
-        "-a",
+        "-a", "--args", nargs="*", default=[], metavar="ARGS", help="list of arguments to pass to the running program",
+    )
+    parser.add_argument(
+        "-p",
         "--absolute-paths",
         default=False,
         action="store_true",
@@ -75,6 +78,7 @@ def do_debug(args, mod):
     # Call the actual debugger with our parameters
     debugger.debug(
         func,
+        args=[args.file or func.__code__.co_filename, *args.args],
         relative_paths=not args.absolute_paths,
         json_out_path=args.output_file,
         video_out_path=args.video,

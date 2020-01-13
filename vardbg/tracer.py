@@ -110,7 +110,13 @@ class Tracer(abc.ABC):
         return self.trace_callback
 
     def run(self: "Debugger", func, *args, **kwargs):
+        # Set function
         self.func = func
+
+        # Override arguments
+        old_args = sys.argv
+        if self.args is not None:
+            sys.argv = self.args
 
         # Run function with trace callback registered
         sys.settrace(self.trace_callback)
@@ -119,6 +125,10 @@ class Tracer(abc.ABC):
         self.profile_end_exec()
         sys.settrace(None)
 
+        # Restore arguments
+        sys.argv = old_args
+
+        # Write summary with collected data
         self.out.write_summary(self.vars, self.exec_start_time, self.exec_stop_time, self.frame_exec_times)
         return ret
 

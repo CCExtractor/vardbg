@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import math
+import sys
 import time
 
 
@@ -13,6 +14,9 @@ def get_tau():
 
 # Example function to debug
 def test_func():  # sourcery off
+    # Print given arguments
+    print("Arguments:", " ".join(sys.argv[1:]))
+
     # Simple variable assignments
     y = 9
     x = y * 2

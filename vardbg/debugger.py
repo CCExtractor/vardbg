@@ -7,8 +7,17 @@ from .tracer import Tracer
 
 class Debugger(DiffProcessor, Profiler, Replayer, Tracer):
     def __init__(
-        self, relative_paths=True, json_out_path=None, video_out_path=None, video_config=None, live_profiler_output=True
+        self,
+        args=None,
+        relative_paths=True,
+        json_out_path=None,
+        video_out_path=None,
+        video_config=None,
+        live_profiler_output=True,
     ):
+        # Arguments to pass to snippet (handled in run())
+        self.args = args
+
         # Whether to use relative paths over absolute ones in output
         self.use_relative_paths = relative_paths
 
