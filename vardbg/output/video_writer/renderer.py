@@ -35,10 +35,19 @@ class FrameRenderer:
         self.caption_font = ImageFont.truetype(*self.cfg.font_caption)
         self.head_font = ImageFont.truetype(*self.cfg.font_heading)
         self.intro_font = ImageFont.truetype(*self.cfg.font_intro)
-        # Code body size (to be calculated later)
+
+        # Sizes and positions to be calculated later
+        self.sizes_populated = False
+        # Code body size
         self.line_height = None
         self.body_cols = None
         self.body_rows = None
+        # Output body start position
+        self.out_x = None
+        self.out_y = None
+        # Output body size
+        self.out_cols = None
+        self.out_rows = None
         # Variable body start positions
         self.vars_x = None
         self.vars_y = None
@@ -49,12 +58,49 @@ class FrameRenderer:
         self.vars_rows = None
         self.ovars_cols = None
         self.ovars_rows = None
+
         # Current video frame (image)
         self.frame = None
 
         # Write intro (if necessary)
         if self.cfg.intro_text and self.cfg.intro_time:
             self.write_intro()
+
+    def calc_sizes(self):
+        # Calculate text sizes
+        w, h = self.draw.textsize("A", font=self.body_font)
+        hw, hh = self.draw.textsize("A", font=self.head_font)
+
+        # Code body size
+        self.line_height = h * self.cfg.line_height
+        self.body_cols = (self.cfg.var_x - self.cfg.sect_padding * 2) // w
+        self.body_rows = ((self.cfg.out_y - self.cfg.sect_padding * 2) / self.line_height) - 1
+
+        # Output body start position
+        self.out_x = self.cfg.sect_padding
+        self.out_y = self.cfg.out_y + self.cfg.head_padding * 2 + hh - self.line_height
+
+        # Output body size
+        self.out_cols = self.body_cols
+        self.out_rows = int((self.cfg.h - self.out_y) / self.line_height)
+
+        # Variable body start positions
+        # Top-left X and Y for last variable section
+        self.vars_x = self.cfg.var_x + self.cfg.sect_padding
+        self.vars_y = self.cfg.head_padding * 2 + hh
+
+        # Columns and rows for last variable section
+        self.vars_cols = (self.cfg.w - self.cfg.var_x - self.cfg.sect_padding * 2) // w
+        self.vars_rows = int(((self.cfg.ovar_y - self.cfg.sect_padding * 2) / self.line_height) - 1)
+
+        # Top-left X and Y for other variables section
+        self.ovars_x = self.vars_x
+        self.ovars_y = self.cfg.ovar_y + self.vars_y - self.line_height
+
+        # Columns and rows for other variables section
+        self.ovars_cols = self.vars_cols
+        ovars_h = self.cfg.h - self.cfg.ovar_y
+        self.ovars_rows = int(((ovars_h - self.cfg.sect_padding * 2) / self.line_height) - 1)
 
     def get_color(self, col):
         if col == self.RED:
@@ -77,13 +123,15 @@ class FrameRenderer:
     def start_frame(self):
         self.new_frame()
 
-        # Calculate code box size (if necessary)
-        if self.line_height is None:
-            w, h = self.draw.textsize("A", font=self.body_font)
-
-            self.line_height = h * self.cfg.line_height
-            self.body_cols = (self.cfg.var_x - self.cfg.sect_padding * 2) // w
-            self.body_rows = ((self.cfg.h - self.cfg.sect_padding * 2) / self.line_height) - 1
+        # Draw output section
+        # Horizontal divider at 4/5 height
+        self.draw.line(((0, self.cfg.out_y), (self.cfg.var_x, self.cfg.out_y)), fill=self.cfg.fg_body, width=1)
+        # Label horizontally centered and padded
+        out_center_x = self.cfg.var_x / 2
+        out_y = self.cfg.out_y + self.cfg.head_padding
+        self.draw_text_center(
+            out_center_x, out_y, "Output", self.head_font, self.cfg.fg_heading,
+        )
 
         # Draw variable section
         # Vertical divider at 2/3 width
@@ -101,26 +149,9 @@ class FrameRenderer:
         ovar_label_y = self.cfg.ovar_y + self.cfg.head_padding
         self.draw_text_center(var_center_x, ovar_label_y, "Other Variables", self.head_font, self.cfg.fg_heading)
 
-        # Save variable body start positions and sizes (if necessary)
-        if self.vars_x is None:
-            # Top-left X and Y for last variable section
-            self.vars_x = self.cfg.var_x + self.cfg.sect_padding
-            hw, hh = self.draw.textsize("A", font=self.head_font)
-            self.vars_y = self.cfg.head_padding * 2 + hh
-
-            # Columns and rows for last variable section
-            vw, vh = self.draw.textsize("A", font=self.body_font)
-            self.vars_cols = (self.cfg.w - self.cfg.var_x - self.cfg.sect_padding * 2) // vw
-            self.vars_rows = int(((self.cfg.ovar_y - self.cfg.sect_padding * 2) / self.line_height) - 1)
-
-            # Top-left X and Y for other variables section
-            self.ovars_x = self.vars_x
-            self.ovars_y = self.cfg.ovar_y + self.vars_y - self.line_height
-
-            # Columns and rows for other variables section
-            self.ovars_cols = self.vars_cols
-            ovars_h = self.cfg.h - self.cfg.ovar_y
-            self.ovars_rows = int(((ovars_h - self.cfg.sect_padding * 2) / self.line_height) - 1)
+        if not self.sizes_populated:
+            self.calc_sizes()
+            self.sizes_populated = True
 
     def finish_frame(self, var_state):
         # Bail out if there's no frame to finish
@@ -189,6 +220,10 @@ class FrameRenderer:
 
             # Draw text
             self.draw.text((x, y_bottom), line, fill=self.cfg.fg_body, font=self.body_font)
+
+    def draw_output(self, lines):
+        lines = lines[-self.out_rows :]
+        self.draw_text_block(lines, self.out_x, self.out_y)
 
     def draw_exec(self, nr_times, cur, avg, total):
         x = self.cfg.sect_padding

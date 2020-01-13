@@ -10,8 +10,8 @@ from .renderer import FrameRenderer
 VarState = collections.namedtuple("VarState", ("name", "color", "action", "text_lines", "other_text_lines"))
 
 
-def wrap_text(text, cols, rows):
-    lines = text.split("\n")
+def wrap_text(text, cols, rows=None):
+    lines = text.replace("\r", "").split("\n")
 
     # Wrap text
     wrapped_lines = []
@@ -23,7 +23,7 @@ def wrap_text(text, cols, rows):
             wrapped_lines += line_wrapped
 
     # Truncate rows and add indicator if necessary
-    if len(wrapped_lines) > rows:
+    if rows is not None and len(wrapped_lines) > rows:
         wrapped_lines = wrapped_lines[:rows]
         wrapped_lines[-1] = wrapped_lines[-1][: cols - 5] + " [...]"
 
@@ -53,6 +53,7 @@ class VideoWriter(Writer):
         self.render.finish_frame(self.last_var)
         self.render.start_frame()
         self.render.draw_code(self.get_file_lines(frame_info.file), frame_info.line)
+        self.render.draw_output(wrap_text(output, self.render.out_cols))
 
     def write_frame_exec(self, frame_info, exec_time, exec_times):
         nr_times = len(exec_times)

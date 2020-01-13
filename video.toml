@@ -15,6 +15,7 @@ watermark = true
 [sizes]
 # These are fractions of the full sizes
 code_width = [2, 3]
+code_height = [4, 5]
 last_variable_height = [1, 4]
 
 # Padding

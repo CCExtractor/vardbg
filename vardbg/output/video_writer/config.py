@@ -48,6 +48,7 @@ class Config:
 
         sizes = self.config["sizes"]
         self.var_x = calc_frac(self.w, sizes["code_width"])
+        self.out_y = calc_frac(self.h, sizes["code_height"])
         self.ovar_y = calc_frac(self.h, sizes["last_variable_height"])
 
         self.head_padding = sizes["heading_padding"]
