@@ -29,6 +29,7 @@ def test_func():  # sourcery off
     lst.append(x)
     lst.append(y)
     del lst[2], lst[1]
+    print("lst =", lst)
 
     # Set modification
     st = {1}
@@ -36,12 +37,14 @@ def test_func():  # sourcery off
     st.add(y)
     st.update({1, 2, 3, 4, 5})
     st.remove(x)
+    print("st =", st)
 
     # Dict modification
     # noinspection PyDictCreation
     dct = {"a": 1, "b": 2, "c": 3}
     dct["d"] = 4
     del dct["c"]
+    print("dct =", dct)
 
     # Multiple assignments on a single line
     v1, v2 = 0, 1
@@ -52,11 +55,13 @@ def test_func():  # sourcery off
 
     # Executing lines multiple times and profiling them
     for i in range(5):
+        print("i =", i)
         time.sleep(0.01)
         pass  # This is an intentionally very long line that exists solely for the purpose of testing line wrapping functionality in the video output writer's text renderer, ignore and do not wrap this line so that it remains useful for its purpose
 
     # Get tau from another function
     tau = get_tau()
+    print("tau =", tau)
 
     # To facilitate verifying the debugger's values
     print("\nFinal test values:")
