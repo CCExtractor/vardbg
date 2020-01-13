@@ -27,7 +27,7 @@ pip install vardbg
 
 All of the program's options are documented in the usage help:
 
-```bash
+```
 $ vardbg --help
 usage: vardbg [-h] [-f [FILE]] [-n [FUNCTION]] [-o [OUTPUT_FILE]] [-v [PATH]] [-c [CONFIG]]
               [-a [ARGS [ARGS ...]]] [-p] [-P]
