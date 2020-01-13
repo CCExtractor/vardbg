@@ -19,9 +19,9 @@ class FrameRenderer:
     def __init__(self, path, config_path):
         # Config
         self.cfg = Config(config_path)
-        # Video writer
+        # Video encoder
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-        self.writer = cv2.VideoWriter(path, fourcc, self.cfg.fps, (self.cfg.w, self.cfg.h))
+        self.encoder = cv2.VideoWriter(path, fourcc, self.cfg.fps, (self.cfg.w, self.cfg.h))
         # Drawing context
         self.draw = None
         # Fonts
@@ -133,7 +133,7 @@ class FrameRenderer:
         # noinspection PyUnresolvedReferences
         cv_img = cv2.cvtColor(np.asarray(self.frame), cv2.COLOR_RGB2BGR)
         # Write data
-        self.writer.write(cv_img)
+        self.encoder.write(cv_img)
 
     def write_intro(self):
         frames = round(self.cfg.intro_time / self.cfg.fps)
@@ -241,5 +241,5 @@ class FrameRenderer:
     def close(self, var_state):
         # Finish final frame
         self.finish_frame(var_state)
-        # Close writer
-        self.writer.release()
+        # Close encoder
+        self.encoder.release()
