@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 ALLOWED_EVENTS = {"call", "line", "return"}
-DISALLOWED_FUNC_NAMES = {"<genexpr>", "<listcomp>", "<dictcomp>"}
+DISALLOWED_FUNC_NAMES = {"<genexpr>", "<listcomp>", "<dictcomp>", "<setcomp>"}
 
 
 class FrameScope:
