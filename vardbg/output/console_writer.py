@@ -7,18 +7,26 @@ from .writer import Writer
 
 class ConsoleWriter(Writer):
     def __init__(self, file=None):
-        # Output fd
+        # Output file
         self.file = file or sys.stdout
         # Current line output prefix
         self.cur_line = ""
+        # Last stdout output length
+        self.stdout_last_len = 0
 
     def print(self, *args, **kwargs):
         print(*args, **kwargs, file=self.file)
 
-    def write_cur_frame(self, frame_info):
+    def write_cur_frame(self, frame_info, output):
         # Construct friendly filename + line number + function string
         file_line = "%s:%-2d" % (frame_info.file, frame_info.line)
         self.cur_line = f"{file_line} ({frame_info.function})"
+
+        # Print new stdout output
+        new_output = output[self.stdout_last_len :]
+        if new_output:
+            self.file.write(new_output)
+        self.stdout_last_len = len(output)
 
     def write_frame_exec(self, frame_info, exec_time, exec_times):
         nr_times = len(exec_times)

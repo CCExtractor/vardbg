@@ -19,7 +19,7 @@ class Replayer(abc.ABC):
             evt_type = event["event"]
 
             if evt_type == NEW_FRAME:
-                self.out.write_cur_frame(event["frame_info"])
+                self.out.write_cur_frame(event["frame_info"], event["output"])
             elif evt_type == EXECUTE_FRAME:
                 frame_info = event["frame_info"]
                 exec_time = event["exec_time"]

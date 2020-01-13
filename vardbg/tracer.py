@@ -1,5 +1,6 @@
 import abc
 import copy
+import io
 import sys
 from typing import TYPE_CHECKING
 
@@ -31,9 +32,11 @@ class Tracer(abc.ABC):
     def __init__(self: "Debugger"):
         # Function being debugged
         self.func = None
-
         # Stack with frame scopes
         self.scope_stack = []
+
+        # stdout buffer
+        self.stdout_buf = io.StringIO()
 
         # Propagate initialization to other mixins
         super().__init__()
@@ -82,7 +85,7 @@ class Tracer(abc.ABC):
         scope.new_locals = copy.deepcopy(frame.f_locals)
 
         # Render output prefix for this frame
-        self.out.write_cur_frame(scope.prev_frame_info)
+        self.out.write_cur_frame(scope.prev_frame_info, self.stdout_buf.getvalue())
 
         # Skip profiler for the first frame since it's before any real execution (just the function call)
         if should_profile:
@@ -113,10 +116,13 @@ class Tracer(abc.ABC):
         # Set function
         self.func = func
 
-        # Override arguments
+        # Override system context
         old_args = sys.argv
         if self.args is not None:
             sys.argv = self.args
+
+        real_stdout = sys.stdout
+        sys.stdout = self.stdout_buf
 
         # Run function with trace callback registered
         sys.settrace(self.trace_callback)
@@ -127,6 +133,7 @@ class Tracer(abc.ABC):
 
         # Restore arguments
         sys.argv = old_args
+        sys.stdout = real_stdout
 
         # Write summary with collected data
         self.out.write_summary(self.vars, self.exec_start_time, self.exec_stop_time, self.frame_exec_times)

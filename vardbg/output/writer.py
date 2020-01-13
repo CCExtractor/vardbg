@@ -3,7 +3,7 @@ import abc
 
 class Writer(abc.ABC):
     @abc.abstractmethod
-    def write_cur_frame(self, frame_info):
+    def write_cur_frame(self, frame_info, output):
         pass
 
     @abc.abstractmethod

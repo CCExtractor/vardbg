@@ -29,8 +29,8 @@ class JsonWriter(Writer):
 
         self.data["events"].append(event)
 
-    def write_cur_frame(self, frame_info):
-        self.write_event(NEW_FRAME, frame_info=frame_info)
+    def write_cur_frame(self, frame_info, output):
+        self.write_event(NEW_FRAME, frame_info=frame_info, output=output)
 
     def write_frame_exec(self, frame_info, exec_time, exec_times):
         # exec_times needs to be copied to preserve the *current* state
