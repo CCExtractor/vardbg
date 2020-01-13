@@ -21,6 +21,7 @@ def test_func():  # sourcery off
     y = 9
     x = y * 2
     x *= 2
+    print("x =", x)
 
     # List modification
     # noinspection PyListCreation
