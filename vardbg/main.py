@@ -7,7 +7,7 @@ from . import ansi, debugger, test
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="A simple debugger that traces local variable changes, lines, and times."
+        description="A simple Python debugger and profiler that can generate animated visualizations of program flow."
     )
 
     parser.add_argument("-f", "--file", nargs="?", type=str, help="Python file to debug, or JSON result file to read")
