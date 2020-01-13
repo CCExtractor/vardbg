@@ -13,8 +13,9 @@ venv/
 __pycache__/
 *.pyc
 
-# Built eggs
+# Build artifacts
 *.egg-info/
+dist/
 
 # Debug output
 *.json
