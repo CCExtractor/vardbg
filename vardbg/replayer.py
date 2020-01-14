@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 import jsonpickle
 
-from .output.json_writer import NEW_FRAME, EXECUTE_FRAME, ADD_VARIABLE, CHANGE_VARIABLE, REMOVE_VARIABLE
+from .output.json_writer import ADD_VARIABLE, CHANGE_VARIABLE, EXECUTE_FRAME, NEW_FRAME, REMOVE_VARIABLE
 
 if TYPE_CHECKING:
     from .debugger import Debugger

@@ -1,6 +1,7 @@
-from .searching import binary_search, bfs, dfs
-from .run import debug_func
 from vardbg import ansi
+
+from .run import debug_func
+from .searching import bfs, binary_search, dfs
 
 SAMPLE_LIST = [2, 3, 4, 10, 40]
 SAMPLE_LIST_ITEM = 10

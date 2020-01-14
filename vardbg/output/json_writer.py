@@ -1,5 +1,6 @@
 import copy
 import time
+
 import jsonpickle
 
 from .writer import Writer

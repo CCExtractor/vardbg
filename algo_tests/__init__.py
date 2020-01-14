@@ -1,7 +1,8 @@
+from vardbg import ansi
+
 from .test_misc import test_misc
 from .test_searching import test_searching
 from .test_sorting import test_sorting
-from vardbg import ansi
 
 
 def run_tests():

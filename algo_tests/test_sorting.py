@@ -1,6 +1,7 @@
-from .sorting import bubble_sort, merge_sort, insertion_sort, shell_sort, selection_sort
-from .run import debug_func
 from vardbg import ansi
+
+from .run import debug_func
+from .sorting import bubble_sort, insertion_sort, merge_sort, selection_sort, shell_sort
 
 SORT_FUNCS = (bubble_sort, merge_sort, insertion_sort, shell_sort, selection_sort)
 SAMPLE_LIST = [19, 2, 31, 45, 6, 11, 121, 27]

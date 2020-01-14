@@ -1,6 +1,7 @@
+from vardbg import ansi
+
 from .misc import knapsack
 from .run import debug_func
-from vardbg import ansi
 
 # | Item | Weight | Value |
 # |------|--------|-------|
