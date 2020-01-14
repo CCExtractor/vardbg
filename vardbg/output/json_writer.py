@@ -37,12 +37,12 @@ class JsonWriter(Writer):
         # exec_times needs to be copied to preserve the *current* state
         self.write_event(EXECUTE_FRAME, frame_info=frame_info, exec_time=exec_time, exec_times=exec_times.copy())
 
-    def write_add(self, var, val, history, *, action="added", plural=False):
+    def write_add(self, var, val, history, *, action, plural):
         self.write_event(
             ADD_VARIABLE, var_name=var, value=val, history=copy.deepcopy(history), action=action, plural=plural,
         )
 
-    def write_change(self, var, val_before, val_after, history, *, action="changed"):
+    def write_change(self, var, val_before, val_after, history, *, action):
         self.write_event(
             CHANGE_VARIABLE,
             var_name=var,
@@ -52,7 +52,7 @@ class JsonWriter(Writer):
             action=action,
         )
 
-    def write_remove(self, var, val, history, *, action="removed"):
+    def write_remove(self, var, val, history, *, action):
         self.write_event(REMOVE_VARIABLE, var_name=var, value=val, history=copy.deepcopy(history), action=action)
 
     def write_summary(self, var_history, exec_start_time, exec_stop_time, frame_exec_times):

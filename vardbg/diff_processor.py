@@ -45,7 +45,9 @@ class DiffProcessor(abc.ABC):
                         )
                     else:
                         # Render it as var[key] for lists, dicts, etc.
-                        self.out.write_add(render.key_var(chg_name, key), val, self._get_history(wrapper))
+                        self.out.write_add(
+                            render.key_var(chg_name, key), val, self._get_history(wrapper), action="added", plural=False
+                        )
 
                 # Record new value
                 self.vars[wrapper].append(data.VarValue(container, frame_info))
@@ -59,7 +61,7 @@ class DiffProcessor(abc.ABC):
                 if ignored:
                     self.vars[wrapper] = data.VarValues(ignored=True)
                 else:
-                    self.out.write_add(name, val, self._get_history(wrapper))
+                    self.out.write_add(name, val, self._get_history(wrapper), action="added", plural=False)
                     self.vars[wrapper] = data.VarValues(data.VarValue(val, frame_info))
 
     def process_change(self: "Debugger", chg_name, chg, frame_info, new_locals):
@@ -80,7 +82,7 @@ class DiffProcessor(abc.ABC):
 
         wrapper = data.Variable(var_name, frame_info)
         if not self.vars[wrapper].ignored:
-            self.out.write_change(chg_name, before, after, self._get_history(wrapper))
+            self.out.write_change(chg_name, before, after, self._get_history(wrapper), action="changed")
             self.vars[wrapper].append(data.VarValue(full_after, frame_info))
 
     def process_remove(self: "Debugger", chg_name, chg, frame_info, new_locals):
@@ -91,7 +93,9 @@ class DiffProcessor(abc.ABC):
 
             if not self.vars[wrapper].ignored:
                 for key, val in chg:
-                    self.out.write_remove(render.key_var(chg_name, key), val, self._get_history(wrapper))
+                    self.out.write_remove(
+                        render.key_var(chg_name, key), val, self._get_history(wrapper), action="removed"
+                    )
 
                 # Get new container contents and log value
                 container = new_locals[chg_name]

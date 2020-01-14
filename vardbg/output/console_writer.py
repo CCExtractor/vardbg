@@ -39,16 +39,16 @@ class ConsoleWriter(Writer):
     def _write_action(self, var, color_func, action, suffix):
         self.print(f"{self.cur_line} | {ansi.bold(var)} {color_func(action)} {suffix}")
 
-    def write_add(self, var, val, history, *, action="added", plural=False):
+    def write_add(self, var, val, history, *, action, plural):
         _plural = "s" if plural else ""
         self._write_action(var, ansi.green, action, f"with value{_plural} {render.val(val)}")
 
-    def write_change(self, var, val_before, val_after, history, *, action="changed"):
+    def write_change(self, var, val_before, val_after, history, *, action):
         self._write_action(
             var, ansi.blue, action, f"from {render.val(val_before)} to {render.val(val_after)}",
         )
 
-    def write_remove(self, var, val, history, *, action="removed"):
+    def write_remove(self, var, val, history, *, action):
         self._write_action(var, ansi.red, action, f"(value: {render.val(val)})")
 
     def _write_var_summary(self, var_history):
