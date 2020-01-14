@@ -62,6 +62,20 @@ optional arguments:
                         disable live profiler output during execution
 ```
 
+For example, this command will debug the function `quick_sort` from the file `sort.py` with the arguments `9 3 5 1` and create a JSON file called `sort1.json`:
+
+```bash
+vardbg -f sort.py -n quick_sort -o sort1.json -a 9 3 5 1
+```
+
+A video can then be generated from the above JSON:
+
+```bash
+vardbg -f sort1.json -v sort_vis.mp4
+```
+
+It is possible to generate videos live while running the debugged program, but this is discouraged because the overhead of video creation inflates execution times greatly and thus ruins profiler results. However, if profiling is not important to you, it is a valid use case.
+
 ## Comments
 
 Special comments can be added to lines of code that define variables to control how vardbg handles said variable:
