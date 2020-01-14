@@ -67,3 +67,4 @@ optional arguments:
 Special comments can be added to lines of code that define variables to control how vardbg handles said variable:
 
 - `# vardbg: ignore` — do not display this variable or track its values
+- `# vardbg: ref lst[i]` — treat variable `i` as the index/key of an element in container `lst` (only shown in videos)
