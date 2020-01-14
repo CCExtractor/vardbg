@@ -10,11 +10,12 @@ This project was created during [Google Code-in](https://codein.withgoogle.com/)
 
 - Tracking the history of each variable and its contents
 - Tracking elements within containers (lists, sets, dicts, etc.)
+- Ignoring specific variables
 - Profiling the execution of each line
 - Summarizing all variables and execution times after execution
 - Passing arguments to debugged programs
 - Exporting execution history in JSON format and replaying (including program output)
-- Creating videos that show program flow, execution times, variables, and output
+- Creating videos that show program flow, execution times, variables (with relationships), and output
 - Writing videos in MP4 and GIF formats
 
 ## Installation
