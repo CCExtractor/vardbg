@@ -16,7 +16,7 @@ This project was created during [Google Code-in](https://codein.withgoogle.com/)
 - Passing arguments to debugged programs
 - Exporting execution history in JSON format and replaying (including program output)
 - Creating videos that show program flow, execution times, variables (with relationships), and output
-- Writing videos in MP4 and GIF formats
+- Writing videos in MP4, GIF, and WebP formats
 
 ## Installation
 

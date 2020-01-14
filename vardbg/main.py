@@ -27,7 +27,7 @@ def parse_args():
         nargs="?",
         type=str,
         metavar="PATH",
-        help="path to write a video representation of the program execution to (MP4 and GIF formats are supported, depending on file extension)",
+        help="path to write a video representation of the program execution to (MP4, GIF, and WebP formats are supported, depending on file extension)",
     )
     parser.add_argument(
         "-c",
