@@ -86,6 +86,9 @@ class VideoWriter(Writer):
         # Render text for "others" section
         other_vars = []
         for var, values in history.other_history:
+            if values.ignored:
+                continue
+
             var_lines = [var.name + ":"]
 
             for value in values:
