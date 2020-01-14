@@ -50,6 +50,7 @@ class VideoWriter(Writer):
         return lines
 
     def write_cur_frame(self, frame_info, output):
+        self.frame_info = frame_info
         self.render.finish_frame(self.last_var)
         self.render.start_frame()
         self.render.draw_code(self.get_file_lines(frame_info.file), frame_info.line)
