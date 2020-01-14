@@ -58,6 +58,12 @@ class FrameRenderer:
         self.ovars_cols = None
         self.ovars_rows = None
 
+        # Per-frame positions
+        self.last_var_x = None
+        self.last_var_y = None
+        self.ref_var_x = None
+        self.ref_var_y = None
+
         # Current video frame (image)
         self.frame = None
 
@@ -252,13 +258,58 @@ class FrameRenderer:
         # Draw remaining text
         self.draw_text_block(state.text_lines, self.vars_x, self.vars_y)
 
+        # Save final action position for relationship drawing (if necessary)
+        if state.ref is not None:
+            aw, ah = self.draw.textsize(state.action + " ", font=self.body_bold_font)
+            self.last_var_x = self.vars_x + nw + aw
+            self.last_var_y = self.vars_y - nh / 2
+
     def draw_other_vars(self, state):
         # Draw text
         self.draw_text_block(state.other_text_lines, self.ovars_x, self.ovars_y)
 
+        # Save referenced variable position for relationship drawing (if necessary)
+        if state.ref is not None:
+            # Find index of the referenced line
+            ref_idx = None
+            line = None
+            for i, line in enumerate(state.other_text_lines):
+                if line == state.ref + ":":
+                    ref_idx = i
+                    break
+            if ref_idx is None:
+                return
+
+            # Calculate target reference position
+            rw, _ = self.draw.textsize(line + " ", font=self.body_font)
+            self.ref_var_x = self.ovars_x + rw
+            self.ref_var_y = self.ovars_y + self.line_height * (ref_idx + 1) - self.line_height / 2
+
+    def draw_var_ref(self):
+        # Calculate X position to route the line on
+        # It should be as short as possible to not cover the variable while not exceeding our width + padding
+        right_line_x = min(
+            max(self.last_var_x, self.ref_var_x) + self.cfg.sect_padding, self.cfg.w - self.cfg.sect_padding / 2
+        )
+
+        # Draw the polyline
+        self.draw.line(
+            (
+                (self.last_var_x, self.last_var_y),
+                (right_line_x, self.last_var_y),
+                (right_line_x, self.ref_var_y),
+                (self.ref_var_x, self.ref_var_y),
+            ),
+            fill=self.cfg.blue,
+            width=2,
+        )
+
     def draw_variables(self, state):
         self.draw_other_vars(state)
         self.draw_last_var(state)
+
+        if state.ref is not None:
+            self.draw_var_ref()
 
     def draw_watermark(self):
         # Get target bottom-right position
