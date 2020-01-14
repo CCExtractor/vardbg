@@ -10,6 +10,9 @@ class GIFEncoder(Encoder):
     def write(self, image):
         self.frames.append(image)
 
+    def save(self, frame_dur):
+        self.frames[0].save(self.path, save_all=True, append_images=self.frames[1:], duration=frame_dur, loop=0)
+
     def stop(self):
         frame_dur = 1000 / self.fps
-        self.frames[0].save(self.path, save_all=True, append_images=self.frames[1:], duration=frame_dur, loop=0)
+        self.save(frame_dur)
