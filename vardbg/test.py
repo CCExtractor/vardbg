@@ -32,10 +32,6 @@ def test_func():  # sourcery off
     lst.append(x)
     lst.append(y)
 
-    # Looping over a list by index
-    for i in range(len(lst)):  # vardbg: ref lst[i]
-        print(lst[i])
-
     # Deleting from a list
     del lst[2], lst[1]
     print("lst =", lst)
@@ -63,7 +59,9 @@ def test_func():  # sourcery off
     del v1, v2
 
     # Executing lines multiple times and profiling them
-    for i in range(5):
+    lst += [6, 7, 12, 14]
+    # Variable relationships
+    for i in range(len(lst)):  # vardbg: ref lst[i]
         print("i =", i)
         time.sleep(0.01)
         pass  # This is an intentionally very long line that exists solely for the purpose of testing line wrapping functionality in the video output writer's text renderer, ignore and do not wrap this line so that it remains useful for its purpose
