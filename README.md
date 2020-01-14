@@ -18,6 +18,10 @@ This project was created during [Google Code-in](https://codein.withgoogle.com/)
 - Creating videos that show program flow, execution times, variables (with relationships), and output
 - Writing videos in MP4, GIF, and WebP formats
 
+## Demo
+
+![Demo Video](https://user-images.githubusercontent.com/7930239/72311897-1fa37d80-363b-11ea-9050-764abb9e1ca7.gif)
+
 ## Installation
 
 The latest tagged version can be obtained from PyPI:
