@@ -4,6 +4,8 @@ A simple Python debugger and profiler that generates animated visualizations of 
 
 **Python 3.6** or newer is required due to the use of f-strings.
 
+This project was created during [Google Code-in](https://codein.withgoogle.com/) 2019 for [CCExtractor Development](https://ccextractor.org/).
+
 ## Features
 
 - Tracking the history of each variable and its contents
