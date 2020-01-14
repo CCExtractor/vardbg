@@ -26,11 +26,17 @@ def test_func():  # sourcery off
     # Hidden variable
     c = 1  # vardbg: ignore
 
-    # List modification
+    # Adding to a list
     # noinspection PyListCreation
     lst = [1]
     lst.append(x)
     lst.append(y)
+
+    # Looping over a list by index
+    for i in range(len(lst)):  # vardbg: lst[i]
+        print(lst[i])
+
+    # Deleting from a list
     del lst[2], lst[1]
     print("lst =", lst)
 

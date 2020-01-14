@@ -38,6 +38,9 @@ class Tracer(abc.ABC):
         # stdout buffer
         self.stdout_buf = io.StringIO()
 
+        # File content cache
+        self.file_cache = {}
+
         # Propagate initialization to other mixins
         super().__init__()
 
@@ -69,7 +72,7 @@ class Tracer(abc.ABC):
 
         # The first frame is when function arguments are populated, so it's important
         # Set itself to the previous frame since its line number *is* where function arguments are defined
-        frame_info = data.FrameInfo(frame, relative=self.use_relative_paths)
+        frame_info = data.FrameInfo(frame, relative=self.use_relative_paths, file_cache=self.file_cache)
         if scope.prev_frame_info is None:
             scope.prev_frame_info = frame_info
             scope.prev_event = event

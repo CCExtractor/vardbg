@@ -1,4 +1,6 @@
 import os.path
+import re
+from pathlib import Path
 
 _relative_path_cache = {}
 
@@ -74,12 +76,27 @@ class VarHistory:
 class FrameInfo:
     """Holds basic information about a stack frame"""
 
-    def __init__(self, frame, *, relative=True):
+    def __init__(self, frame, *, relative=True, file_cache=None):
         self.function = frame.f_code.co_name
         self.file = _get_path(frame.f_code.co_filename, relative)
         self.line = frame.f_lineno
 
         self.file_line = f"{self.file}:{self.line}"
+
+        # Extract vardbg comment from line
+        line = self._get_line(file_cache)
+        match = re.match(r"^.+# vardbg: (.+)$", line)
+        self.comment = "" if match is None else match.group(1)
+
+    def _get_line(self, file_cache):
+        # Read lines from cache if possible, otherwise read from file and save to cache
+        if file_cache and self.file in file_cache:
+            lines = file_cache[self.file]
+        else:
+            lines = Path(self.file).read_text().replace("\r", "").splitlines()
+            file_cache[self.file] = lines
+
+        return lines[self.line - 1]
 
     def to_tuple(self):
         # Produce an identifying tuple for hashing and equality comparison

@@ -1,5 +1,4 @@
 import abc
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 import dictdiffer
@@ -23,16 +22,6 @@ class DiffProcessor(abc.ABC):
 
     def _get_history(self, wrapper):
         return data.VarHistory(wrapper, self.vars)
-
-    def _get_line(self, frame_info):
-        # Read lines from cache if possible, otherwise read from file and save to cache
-        try:
-            lines = self.file_cache[frame_info.file]
-        except KeyError:
-            lines = Path(frame_info.file).read_text().replace("\r", "").splitlines()
-            self.file_cache[frame_info.file] = lines
-
-        return lines[frame_info.line - 1]
 
     def process_add(self: "Debugger", chg_name, chg, frame_info, new_locals):
         # If we have a changed variable, elements were added to a list/set/dict
@@ -66,7 +55,7 @@ class DiffProcessor(abc.ABC):
             # chg is a list of tuples with variable names and values
             for name, val in chg:
                 wrapper = data.Variable(name, frame_info)
-                ignored = self._get_line(frame_info).endswith("# vardbg: ignore")
+                ignored = frame_info.comment == "ignore"
                 if ignored:
                     self.vars[wrapper] = data.VarValues(ignored=True)
                 else:
