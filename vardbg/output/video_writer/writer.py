@@ -1,4 +1,5 @@
 import collections
+import re
 import statistics
 import textwrap
 from pathlib import Path
@@ -7,7 +8,7 @@ from ... import render
 from ..writer import Writer
 from .renderer import FrameRenderer
 
-VarState = collections.namedtuple("VarState", ("name", "color", "action", "text_lines", "other_text_lines"))
+VarState = collections.namedtuple("VarState", ("name", "color", "action", "ref", "text_lines", "other_text_lines"))
 
 
 def wrap_text(text, cols, rows=None):
@@ -95,8 +96,23 @@ class VideoWriter(Writer):
         others_text = "\n\n".join(other_vars)
         wrapped_others_text = wrap_text(others_text, int(self.render.ovars_cols), int(self.render.ovars_rows))
 
+        # Parse reference comments
+        match = re.match(r"^ref (.+)\[(.+)\]$", self.frame_info.comment)
+        if match is None:
+            ref = None
+        else:
+            # Extract values
+            container = match.group(1)
+            key = match.group(2)
+
+            # Make sure both the key matches this variable and the container exists in this scope
+            if key == name and any(var.name == container for var, values in history.other_history):
+                ref = container
+            else:
+                ref = None
+
         # Save state; this is drawn when the frame is finished
-        self.last_var = VarState(name, self.render.get_color(color), action, wrapped_text, wrapped_others_text)
+        self.last_var = VarState(name, self.render.get_color(color), action, ref, wrapped_text, wrapped_others_text)
 
     def write_add(self, var, val, history, *, action="added", plural):
         self._write_action(var, self.render.GREEN, action, {"Value": repr(val)}, history)

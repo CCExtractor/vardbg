@@ -33,7 +33,7 @@ def test_func():  # sourcery off
     lst.append(y)
 
     # Looping over a list by index
-    for i in range(len(lst)):  # vardbg: lst[i]
+    for i in range(len(lst)):  # vardbg: ref lst[i]
         print(lst[i])
 
     # Deleting from a list
