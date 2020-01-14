@@ -285,9 +285,9 @@ class FrameRenderer:
             self.ref_var_x = self.ovars_x + rw
             self.ref_var_y = self.ovars_y + self.line_height * (ref_idx + 1) - self.line_height / 2
 
-    def draw_var_ref(self):
+    def draw_var_ref(self, state):
         # Calculate X position to route the line on
-        # It should be as short as possible to not cover the variable while not exceeding our width + padding
+        # It should be as short as possible while not obscuring any variables or exceeding the scene width
         right_line_x = min(
             max(self.last_var_x, self.ref_var_x) + self.cfg.sect_padding, self.cfg.w - self.cfg.sect_padding / 2
         )
@@ -300,7 +300,7 @@ class FrameRenderer:
                 (right_line_x, self.ref_var_y),
                 (self.ref_var_x, self.ref_var_y),
             ),
-            fill=self.cfg.blue,
+            fill=state.color,
             width=2,
         )
 
@@ -309,7 +309,7 @@ class FrameRenderer:
         self.draw_last_var(state)
 
         if state.ref is not None:
-            self.draw_var_ref()
+            self.draw_var_ref(state)
 
     def draw_watermark(self):
         # Get target bottom-right position
