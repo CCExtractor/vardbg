@@ -176,7 +176,7 @@ class FrameRenderer:
         self.encoder.write(self.frame)
 
     def write_intro(self):
-        frames = round(self.cfg.intro_time / self.cfg.fps)
+        frames = round(self.cfg.intro_time * self.cfg.fps)
         for _ in range(frames):
             self.new_frame()
             x = self.cfg.w / 2
