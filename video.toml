@@ -3,7 +3,7 @@
 width = 1920
 height = 1080
 # Frames per second, higher is faster (can be fractional)
-fps = 1.5
+fps = 2
 
 # Text to display on an intro screen (empty to disable)
 intro_text = ""
