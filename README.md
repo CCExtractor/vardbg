@@ -82,3 +82,7 @@ Special comments can be added to lines of code that define variables to control 
 
 - `# vardbg: ignore` — do not display this variable or track its values
 - `# vardbg: ref lst[i]` — treat variable `i` as the index/key of an element in container `lst` (only shown in videos)
+
+## Contributing
+
+Feel free to contribute to this project! You can add features, fix bugs, or make any other improvements you see fit. We just ask that you follow the [code style guidelines](https://github.com/CCExtractor/vardbg/blob/master/CODE_STYLE.md) to keep the code consistent and coherent. Once your contribution meets the guidelines, [open a pull request](https://github.com/CCExtractor/vardbg/compare) to make things official.
