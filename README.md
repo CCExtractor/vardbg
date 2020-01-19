@@ -20,7 +20,7 @@ This project was created during [Google Code-in](https://codein.withgoogle.com/)
 
 ## Demo
 
-![Demo Video](https://user-images.githubusercontent.com/7930239/72311897-1fa37d80-363b-11ea-9050-764abb9e1ca7.gif)
+![Demo Video](https://user-images.githubusercontent.com/7930239/72677173-77345580-3a4e-11ea-9968-dae3eee7d122.gif)
 
 ## Installation
 
