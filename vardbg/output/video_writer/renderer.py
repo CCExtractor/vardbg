@@ -77,12 +77,17 @@ class FrameRenderer:
         if self.cfg.intro_text and self.cfg.intro_time:
             self.write_intro()
 
+    def text_size(self, text, factor=10, **kwargs):
+        # Multiply string and divide by the factor to get a more precise width
+        w, h = self.draw.textsize(text * factor, **kwargs)
+        return w / factor, h
+
     def calc_sizes(self):
         # Calculate text sizes
-        w = self.draw.textsize(SAMPLE_CHARS, font=self.body_font)[0] / len(SAMPLE_CHARS)
-        hw, hh = self.draw.textsize("A", font=self.head_font)
-        _, mh = self.draw.textsize("`^Ag", font=self.body_font)
-        _, ch = self.draw.textsize("1p", font=self.caption_font)
+        w = self.text_size(SAMPLE_CHARS, font=self.body_font)[0] / len(SAMPLE_CHARS)
+        hw, hh = self.text_size("A", font=self.head_font)
+        _, mh = self.text_size("`^Ag", font=self.body_font)
+        _, ch = self.text_size("1p", font=self.caption_font)
 
         # Code body size
         self.line_height = mh * self.cfg.line_height
@@ -125,7 +130,7 @@ class FrameRenderer:
             return self.cfg.blue
 
     def draw_text_center(self, x, y, text, font, color):
-        w, h = self.draw.textsize(text, font=font)
+        w, h = self.text_size(text, font=font)
         self.draw.text((x - w / 2, y - h / 2), text, font=font, fill=color)
 
     def new_frame(self):
@@ -230,7 +235,7 @@ class FrameRenderer:
         plural = "" if nr_times == 1 else "s"
         text = f"Line executed {nr_times} time{plural} — current time elapsed: {cur}, average: {avg}, total: {total}"
 
-        _, h = self.draw.textsize(text, font=self.caption_font)
+        _, h = self.text_size(text, font=self.caption_font)
         x = self.cfg.sect_padding
         y = self.cfg.out_y - self.cfg.sect_padding - h
         self.draw.text((x, y), text, font=self.caption_font)
@@ -277,7 +282,7 @@ class FrameRenderer:
             max(self.last_var_x, self.ref_var_x) + self.cfg.sect_padding, self.cfg.w - self.cfg.sect_padding / 2
         )
 
-        sw, sh = self.draw.textsize(" ", font=self.body_font)
+        sw, sh = self.text_size(" ", font=self.body_font)
 
         # Draw the polyline
         self.draw.line(
@@ -305,7 +310,7 @@ class FrameRenderer:
         y = self.cfg.h - self.cfg.sect_padding
 
         # Subtract text size to position it properly
-        w, h = self.draw.textsize(WATERMARK, font=self.caption_font)
+        w, h = self.text_size(WATERMARK, font=self.caption_font)
         x -= w
         y -= h
 

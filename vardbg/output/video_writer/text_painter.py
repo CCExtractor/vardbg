@@ -3,6 +3,7 @@ TRUNC_SUFFIX = " [...]"
 
 class TextPainter:
     def __init__(self, renderer, x_start, y_start, cols, rows, color=None, x_end=None, show_truncate=True):
+        self.render = renderer
         self.draw = renderer.draw
         self.font = renderer.body_font
         self.bold_font = renderer.body_bold_font
@@ -15,10 +16,7 @@ class TextPainter:
         self.y_start = y_start
         self.cols = cols
         self.rows = rows
-
-        # Monospace is assumed
-        _, self.char_width = self.draw.textsize("A", font=self.font)
-        self.x_end = x_end or self.cols * self.char_width
+        self.x_end = x_end or x_start
 
         self.full = False
         self.cols_used = 0
@@ -61,7 +59,7 @@ class TextPainter:
 
                 draw_seg = line[:cols_remaining]
                 # Get text size and center it vertically
-                tw, th = self.draw.textsize(draw_seg, font=font)
+                tw, th = self.render.text_size(draw_seg, font=font)
                 if is_continuation:
                     center_y = self.last_line_y
                 else:
