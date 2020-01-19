@@ -1,3 +1,6 @@
+TRUNC_SUFFIX = " [...]"
+
+
 class TextPainter:
     def __init__(self, renderer, x_start, y_start, cols, rows, color=None, x_end=None):
         self.draw = renderer.draw
@@ -15,6 +18,7 @@ class TextPainter:
         _, self.char_width = self.draw.textsize("A", font=self.font)
         self.x_end = x_end or self.cols * self.char_width
 
+        self.full = False
         self.cols_used = 0
         self.rows_used = 0
         self.cur_x = x_start
@@ -22,10 +26,17 @@ class TextPainter:
         self.last_line_height = self.line_height
 
     def new_line(self):
-        self.cols_used = 0
-        self.cur_x = self.x_start
-        self.cur_y += self.line_height
         self.rows_used += 1
+        if self.rows_used == self.rows:
+            # Truncate if enough space remains
+            if self.cols_used < self.cols - len(TRUNC_SUFFIX):
+                self.write(TRUNC_SUFFIX)
+
+            self.full = True
+        else:
+            self.cols_used = 0
+            self.cur_x = self.x_start
+            self.cur_y += self.line_height
 
     def write(self, text, bold=False, color=None, bg_color=None, return_pos="V"):
         font = self.bold_font if bold else self.font
@@ -36,7 +47,7 @@ class TextPainter:
 
         lines = text.split("\n")
         for idx, line in enumerate(lines):
-            while line:
+            while not self.full and line:
                 # Calculate space and coordinates
                 cols_remaining = self.cols - self.cols_used
                 y_bottom = self.cur_y - self.line_height
