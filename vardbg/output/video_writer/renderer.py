@@ -73,14 +73,27 @@ class FrameRenderer:
         # Current video frame (image)
         self.frame = None
 
+        # Text size cache
+        self.text_size_cache = {}
+
         # Write intro (if necessary)
         if self.cfg.intro_text and self.cfg.intro_time:
             self.write_intro()
 
     def text_size(self, text, factor=10, **kwargs):
-        # Multiply string and divide by the factor to get a more precise width
-        w, h = self.draw.textsize(text * factor, **kwargs)
-        return w / factor, h
+        cache_key = (text, kwargs.get("font", None))
+
+        if cache_key in self.text_size_cache:
+            return self.text_size_cache[cache_key]
+        else:
+            # Multiply string and divide by the factor to get a more precise width
+            w, h = self.draw.textsize(text * factor, **kwargs)
+            w /= factor
+
+            # Save to cache and return
+            sizes = (w, h)
+            self.text_size_cache[cache_key] = sizes
+            return sizes
 
     def calc_sizes(self):
         # Calculate text sizes
