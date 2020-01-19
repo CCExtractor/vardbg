@@ -158,7 +158,7 @@ class FrameRenderer:
 
         # Draw output section
         # Horizontal divider at 4/5 height
-        self.draw.line(((0, self.cfg.out_y), (self.cfg.var_x, self.cfg.out_y)), fill=self.cfg.fg_body, width=1)
+        self.draw.line(((0, self.cfg.out_y), (self.cfg.var_x, self.cfg.out_y)), fill=self.cfg.fg_divider, width=1)
         # Label horizontally centered and padded
         out_center_x = self.cfg.var_x / 2
         out_y = self.cfg.out_y + self.cfg.head_padding
@@ -168,7 +168,7 @@ class FrameRenderer:
 
         # Draw variable section
         # Vertical divider at 2/3 width
-        self.draw.line(((self.cfg.var_x, 0), (self.cfg.var_x, self.cfg.h)), fill=self.cfg.fg_body, width=1)
+        self.draw.line(((self.cfg.var_x, 0), (self.cfg.var_x, self.cfg.h)), fill=self.cfg.fg_divider, width=1)
         # Label horizontally centered in the variable section and vertically padded
         var_center_x = self.cfg.var_x + ((self.cfg.w - self.cfg.var_x) / 2)
         self.draw_text_center(var_center_x, self.cfg.head_padding, "Last Variable", self.head_font, self.cfg.fg_heading)
@@ -176,7 +176,7 @@ class FrameRenderer:
         # Draw other variables section
         # Horizontal divider at 1/3 height
         self.draw.line(
-            ((self.cfg.var_x, self.cfg.ovar_y), (self.cfg.w, self.cfg.ovar_y)), fill=self.cfg.fg_body, width=1
+            ((self.cfg.var_x, self.cfg.ovar_y), (self.cfg.w, self.cfg.ovar_y)), fill=self.cfg.fg_divider, width=1
         )
         # Label similar to the first, but in the others section instead
         ovar_label_y = self.cfg.ovar_y + self.cfg.head_padding

@@ -97,6 +97,7 @@ class Config:
 
         self.bg = parse_hex_color(style.background_color)
         self.highlight = parse_hex_color(style.highlight_color)
+        self.fg_divider = self.styles[Token.Generic.Subheading]["color"]
         self.fg_heading = self.styles[Token.Name]["color"]
         self.fg_body = self.styles[Token.Text]["color"]
         self.fg_watermark = self.styles[Token.Comment]["color"]
