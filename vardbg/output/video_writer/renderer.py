@@ -40,8 +40,10 @@ class FrameRenderer:
         self.head_font = ImageFont.truetype(*self.cfg.font_heading)
         self.intro_font = ImageFont.truetype(*self.cfg.font_intro)
 
+        # Whether the watermark has been drawn on this frame
+        self._watermark_drawn = False
+
         # Sizes and positions to be calculated later
-        self.sizes_populated = False
         # Code body size
         self.line_height = None
         self.body_cols = None
@@ -75,6 +77,10 @@ class FrameRenderer:
 
         # Text size cache
         self.text_size_cache = {}
+
+        # Prepare base frame
+        self.base_frame = None
+        self.prepare_base_frame()
 
         # Write intro (if necessary)
         if self.cfg.intro_text and self.cfg.intro_time:
@@ -146,14 +152,9 @@ class FrameRenderer:
         w, h = self.text_size(text, font=font)
         self.draw.text((x - w / 2, y - h / 2), text, font=font, fill=color)
 
-    def new_frame(self):
-        # Create image
-        self.frame = Image.new("RGB", (self.cfg.w, self.cfg.h), self.cfg.bg)
-        # Create drawing context
-        self.draw = ImageDraw.Draw(self.frame)
-
-    def start_frame(self):
-        self.new_frame()
+    def prepare_base_frame(self):
+        # Create new empty frame
+        self.new_frame(from_base=False)
 
         # Draw output section
         # Horizontal divider at 4/5 height
@@ -181,9 +182,27 @@ class FrameRenderer:
         ovar_label_y = self.cfg.ovar_y + self.cfg.head_padding
         self.draw_text_center(var_center_x, ovar_label_y, "Other Variables", self.head_font, self.cfg.fg_heading)
 
-        if not self.sizes_populated:
-            self.calc_sizes()
-            self.sizes_populated = True
+        # Populate sizes and positions
+        self.calc_sizes()
+
+        # Save frame as base and reset current frame
+        self.base_frame = self.frame
+        self.frame = None
+
+    def new_frame(self, from_base=True):
+        # Create image
+        if from_base:
+            self.frame = self.base_frame.copy()
+        else:
+            self.frame = Image.new("RGB", (self.cfg.w, self.cfg.h), self.cfg.bg)
+
+        # Create drawing context
+        self.draw = ImageDraw.Draw(self.frame)
+        # Reset watermark drawn flag
+        self._watermark_drawn = False
+
+    def start_frame(self):
+        self.new_frame()
 
     def finish_frame(self, var_state):
         # Bail out if there's no frame to finish
@@ -194,18 +213,22 @@ class FrameRenderer:
         if var_state is not None:
             self.draw_variables(var_state)
 
-        if self.cfg.watermark:
+        if self.cfg.watermark and not self._watermark_drawn:
             self.draw_watermark()
+            self._watermark_drawn = True
 
         self.encoder.write(self.frame)
 
     def write_intro(self):
+        # Render frame
+        self.new_frame(from_base=False)
+        x = self.cfg.w / 2
+        y = self.cfg.h / 2
+        self.draw_text_center(x, y, self.cfg.intro_text, self.intro_font, self.cfg.fg_heading)
+
+        # Repeatedly write frame
         frames = round(self.cfg.intro_time * self.cfg.fps)
         for _ in range(frames):
-            self.new_frame()
-            x = self.cfg.w / 2
-            y = self.cfg.h / 2
-            self.draw_text_center(x, y, self.cfg.intro_text, self.intro_font, self.cfg.fg_heading)
             self.finish_frame(None)
 
     def draw_code(self, lines, cur_line):
