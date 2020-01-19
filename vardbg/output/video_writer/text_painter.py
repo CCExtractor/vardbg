@@ -27,11 +27,12 @@ class TextPainter:
         self.cur_y += self.line_height
         self.rows_used += 1
 
-    def write(self, text, bold=False, color=None, bg_color=None):
+    def write(self, text, bold=False, color=None, bg_color=None, return_pos="V"):
         font = self.bold_font if bold else self.font
         color = color or self.color
         last_draw_x = self.cur_x
         last_draw_y = self.cur_y
+        tw = 0
 
         lines = text.split("\n")
         for idx, line in enumerate(lines):
@@ -69,5 +70,8 @@ class TextPainter:
             if idx != len(lines) - 1:
                 self.new_line()
 
-        # Return vertically centered ending position of this segment
-        return last_draw_x, last_draw_y - self.line_height / 2
+        # Return requested position
+        if return_pos == "H":
+            return last_draw_x - tw / 2, last_draw_y - self.line_height
+        elif return_pos == "V":
+            return last_draw_x, last_draw_y - self.line_height / 2

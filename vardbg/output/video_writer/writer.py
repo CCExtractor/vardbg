@@ -8,7 +8,7 @@ from ... import render
 from ..writer import Writer
 from .renderer import FrameRenderer
 
-VarState = collections.namedtuple("VarState", ("name", "color", "action", "ref", "text", "other_text"))
+VarState = collections.namedtuple("VarState", ("name", "color", "action", "value", "ref", "text", "other_history"))
 
 
 def wrap_text(text, cols, rows=None):
@@ -65,7 +65,7 @@ class VideoWriter(Writer):
 
         self.render.draw_exec(nr_times, this_time, avg_time, total_time)
 
-    def _write_action(self, name, color, action, fields, history):
+    def _write_action(self, name, val, color, action, fields, history):
         # Render fields
         fields_text = "\n".join(f"{field}: {value}" for field, value in fields.items())
 
@@ -81,21 +81,6 @@ class VideoWriter(Writer):
 
         # Render and split full text
         text = fields_text + history_text
-
-        # Render text for "others" section
-        other_vars = []
-        for var, values in history.other_history:
-            if values.ignored:
-                continue
-
-            var_lines = [var.name + ":"]
-
-            for value in values:
-                var_lines.append(repr(value.value))
-
-            other_vars.append("\n    \u2022 ".join(var_lines))
-
-        others_text = "\n\n".join(other_vars)
 
         # Parse reference comments
         match = re.match(r"^ref (.+)\[(.+)\]$", self.frame_info.comment)
@@ -113,18 +98,18 @@ class VideoWriter(Writer):
                 ref = None
 
         # Save state; this is drawn when the frame is finished
-        self.last_var = VarState(name, self.render.get_color(color), action, ref, text, others_text)
+        self.last_var = VarState(name, self.render.get_color(color), action, val, ref, text, history.other_history)
 
     def write_add(self, var, val, history, *, action="added", plural):
-        self._write_action(var, self.render.GREEN, action, {"Value": repr(val)}, history)
+        self._write_action(var, val, self.render.GREEN, action, {"Value": repr(val)}, history)
 
     def write_change(self, var, val_before, val_after, history, *, action="changed"):
         self._write_action(
-            var, self.render.BLUE, action, {"From": repr(val_before), "To": repr(val_after)}, history,
+            var, val_after, self.render.BLUE, action, {"From": repr(val_before), "To": repr(val_after)}, history,
         )
 
     def write_remove(self, var, val, history, *, action="removed"):
-        self._write_action(var, self.render.RED, action, {"Last value": repr(val)}, history)
+        self._write_action(var, val, self.render.RED, action, {"Last value": repr(val)}, history)
 
     def write_summary(self, var_history, exec_start_time, exec_stop_time, frame_exec_times):
         # Video doesn't have a summary

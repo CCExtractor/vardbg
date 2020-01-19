@@ -6,6 +6,7 @@ from PIL import Image, ImageDraw, ImageFont
 from .config import Config
 from .gif_encoder import GIFEncoder
 from .opencv_encoder import OpenCVEncoder
+from .text_format import irepr
 from .text_painter import TextPainter
 from .webp_encoder import WebPEncoder
 
@@ -254,26 +255,27 @@ class FrameRenderer:
         painter.write(state.text)
 
     def draw_other_vars(self, state):
-        # Draw text
         painter = TextPainter(self, self.ovars_x, self.ovars_y, self.ovars_cols, self.ovars_rows)
-        painter.write(state.other_text)
 
-        # Save referenced variable position for relationship drawing (if necessary)
-        if state.ref is not None:
-            # Find index of the referenced line
-            ref_idx = None
-            line = None
-            for i, line in enumerate(state.other_text.split("\n")):
-                if line == state.ref + ":":
-                    ref_idx = i
-                    break
-            if ref_idx is None:
-                return
+        # Draw text
+        for idx, (var, values) in enumerate(state.other_history):
+            if values.ignored:
+                continue
 
-            # Calculate target reference position
-            rw, _ = self.draw.textsize(line + " ", font=self.body_font)
-            self.ref_var_x = self.ovars_x + rw
-            self.ref_var_y = self.ovars_y + self.line_height * ref_idx - self.line_height / 2
+            if idx > 0:
+                painter.write("\n\n")
+
+            painter.write(var.name + ":")
+
+            for v_idx, value in enumerate(values):  # sourcery off
+                painter.write("\n    \u2022 ")
+
+                # Reference highlighting for latest value and matching variables only
+                if var.name == state.ref and v_idx == len(values) - 1:
+                    v_pos = irepr(painter, value.value, state.value, bold=True, color=state.color, return_pos="H")
+                    self.ref_var_x, self.ref_var_y = v_pos
+                else:
+                    irepr(painter, value.value)
 
     def draw_var_ref(self, state):
         # Calculate X position to route the line on
@@ -282,12 +284,15 @@ class FrameRenderer:
             max(self.last_var_x, self.ref_var_x) + self.cfg.sect_padding, self.cfg.w - self.cfg.sect_padding / 2
         )
 
+        sw, sh = self.draw.textsize(" ", font=self.body_font)
+
         # Draw the polyline
         self.draw.line(
             (
                 (self.last_var_x, self.last_var_y),
                 (right_line_x, self.last_var_y),
-                (right_line_x, self.ref_var_y),
+                (right_line_x, self.ref_var_y - sh),
+                (self.ref_var_x, self.ref_var_y - sh),
                 (self.ref_var_x, self.ref_var_y),
             ),
             fill=state.color,
