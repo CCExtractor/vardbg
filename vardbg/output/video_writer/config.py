@@ -1,6 +1,9 @@
 from pathlib import Path
 
 import toml
+from pygments.formatter import Formatter
+from pygments.styles.monokai import MonokaiStyle
+from pygments.token import Token
 
 BASE_PATH = Path(__file__).parent / ".." / ".." / ".."
 DEFAULT_CFG_PATH = BASE_PATH / "config.toml"
@@ -28,6 +31,32 @@ def sub_path(path):
 def calc_frac(value, frac):
     num, denom = frac
     return round(value * num / denom)
+
+
+def parse_hex_color(string):
+    if string.startswith("#"):
+        string = string[1:]
+
+    r = int(string[0:2], 16)
+    g = int(string[2:4], 16)
+    b = int(string[4:6], 16)
+
+    return r, g, b, 255
+
+
+def load_style(style):
+    styles = {}
+    formatter = Formatter(style=style)
+
+    for token, params in formatter.style:
+        color = parse_hex_color(params["color"]) if params["color"] else None
+        # Italic and underline styles aren't supported, so just use bold for them
+        bold = params["bold"] or params["italic"] or params["underline"]
+
+        # Save style
+        styles[token] = {"color": color, "bold": bold}
+
+    return styles
 
 
 class Config:
@@ -63,13 +92,15 @@ class Config:
         self.font_heading = (sub_path(fonts["heading"]), fonts["heading_size"])
         self.font_intro = (sub_path(fonts["intro"]), fonts["intro_size"])
 
-        colors = self.config["colors"]
-        self.bg = tuple(colors["background"])
-        self.fg_heading = tuple(colors["heading"])
-        self.fg_body = tuple(colors["body"])
-        self.fg_watermark = tuple(colors["watermark"])
-        self.highlight = tuple(colors["highlight"])
+        style = MonokaiStyle
+        self.styles = load_style(style)
 
-        self.red = tuple(colors["red"])
-        self.green = tuple(colors["green"])
-        self.blue = tuple(colors["blue"])
+        self.bg = parse_hex_color(style.background_color)
+        self.highlight = parse_hex_color(style.highlight_color)
+        self.fg_heading = self.styles[Token.Name]["color"]
+        self.fg_body = self.styles[Token.Text]["color"]
+        self.fg_watermark = self.styles[Token.Comment]["color"]
+
+        self.red = self.styles[Token.Operator]["color"]
+        self.green = self.styles[Token.Name.Function]["color"]
+        self.blue = self.styles[Token.Keyword]["color"]
