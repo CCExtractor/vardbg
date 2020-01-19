@@ -2,12 +2,14 @@ TRUNC_SUFFIX = " [...]"
 
 
 class TextPainter:
-    def __init__(self, renderer, x_start, y_start, cols, rows, color=None, x_end=None):
+    def __init__(self, renderer, x_start, y_start, cols, rows, color=None, x_end=None, show_truncate=True):
         self.draw = renderer.draw
         self.font = renderer.body_font
         self.bold_font = renderer.body_bold_font
         self.line_height = renderer.line_height
         self.color = color or renderer.cfg.fg_body
+
+        self.show_truncate = show_truncate
 
         self.x_start = x_start
         self.y_start = y_start
@@ -28,8 +30,8 @@ class TextPainter:
     def new_line(self):
         self.rows_used += 1
         if self.rows_used == self.rows:
-            # Truncate if enough space remains
-            if self.cols_used < self.cols - len(TRUNC_SUFFIX):
+            # Show truncation indicator if requested and enough space remains
+            if self.show_truncate and self.cols_used < self.cols - len(TRUNC_SUFFIX):
                 self.write(TRUNC_SUFFIX)
 
             self.full = True
