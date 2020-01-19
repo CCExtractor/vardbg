@@ -23,7 +23,7 @@ class TextPainter:
         self.rows_used = 0
         self.cur_x = x_start
         self.cur_y = y_start
-        self.last_line_height = self.line_height
+        self.last_line_y = None
 
     def new_line(self):
         self.rows_used += 1
@@ -61,14 +61,15 @@ class TextPainter:
                 # Get text size and center it vertically
                 tw, th = self.draw.textsize(draw_seg, font=font)
                 if is_continuation:
-                    th = self.last_line_height
-                center_y = y_bottom + ((self.line_height - th) / 2)
+                    center_y = self.last_line_y
+                else:
+                    center_y = y_bottom + ((self.line_height - th) / 2)
                 # Draw text
                 self.draw.text((self.cur_x, center_y), draw_seg, font=font, fill=color)
                 # Account for drawn text
                 self.cur_x += tw
                 line = line[cols_remaining:]
-                self.last_line_height = th
+                self.last_line_y = center_y
 
                 # Advance line if text is remaining
                 if line:
