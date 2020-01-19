@@ -8,7 +8,7 @@ from ... import render
 from ..writer import Writer
 from .renderer import FrameRenderer
 
-VarState = collections.namedtuple("VarState", ("name", "color", "action", "ref", "text_lines", "other_text_lines"))
+VarState = collections.namedtuple("VarState", ("name", "color", "action", "ref", "text", "other_text"))
 
 
 def wrap_text(text, cols, rows=None):
@@ -81,7 +81,6 @@ class VideoWriter(Writer):
 
         # Render and split full text
         text = fields_text + history_text
-        wrapped_text = wrap_text(text, int(self.render.vars_cols), int(self.render.vars_rows))
 
         # Render text for "others" section
         other_vars = []
@@ -97,7 +96,6 @@ class VideoWriter(Writer):
             other_vars.append("\n    \u2022 ".join(var_lines))
 
         others_text = "\n\n".join(other_vars)
-        wrapped_others_text = wrap_text(others_text, int(self.render.ovars_cols), int(self.render.ovars_rows))
 
         # Parse reference comments
         match = re.match(r"^ref (.+)\[(.+)\]$", self.frame_info.comment)
@@ -115,7 +113,7 @@ class VideoWriter(Writer):
                 ref = None
 
         # Save state; this is drawn when the frame is finished
-        self.last_var = VarState(name, self.render.get_color(color), action, ref, wrapped_text, wrapped_others_text)
+        self.last_var = VarState(name, self.render.get_color(color), action, ref, text, others_text)
 
     def write_add(self, var, val, history, *, action="added", plural):
         self._write_action(var, self.render.GREEN, action, {"Value": repr(val)}, history)

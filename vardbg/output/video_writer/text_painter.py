@@ -1,0 +1,73 @@
+class TextPainter:
+    def __init__(self, renderer, x_start, y_start, cols, rows, color=None, x_end=None):
+        self.draw = renderer.draw
+        self.font = renderer.body_font
+        self.bold_font = renderer.body_bold_font
+        self.line_height = renderer.line_height
+        self.color = color or renderer.cfg.fg_body
+
+        self.x_start = x_start
+        self.y_start = y_start
+        self.cols = cols
+        self.rows = rows
+
+        # Monospace is assumed
+        _, self.char_width = self.draw.textsize("A", font=self.font)
+        self.x_end = x_end or self.cols * self.char_width
+
+        self.cols_used = 0
+        self.rows_used = 0
+        self.cur_x = x_start
+        self.cur_y = y_start
+        self.last_line_height = self.line_height
+
+    def new_line(self):
+        self.cols_used = 0
+        self.cur_x = self.x_start
+        self.cur_y += self.line_height
+        self.rows_used += 1
+
+    def write(self, text, bold=False, color=None, bg_color=None):
+        font = self.bold_font if bold else self.font
+        color = color or self.color
+        last_draw_x = self.cur_x
+        last_draw_y = self.cur_y
+
+        lines = text.split("\n")
+        for idx, line in enumerate(lines):
+            while line:
+                # Calculate space and coordinates
+                cols_remaining = self.cols - self.cols_used
+                y_bottom = self.cur_y - self.line_height
+                is_continuation = self.cols_used != 0
+
+                # Draw background if requested
+                if bg_color is not None:
+                    self.draw.rectangle(((self.cur_x, self.cur_y), (self.x_end, y_bottom)), fill=bg_color)
+
+                draw_seg = line[:cols_remaining]
+                # Get text size and center it vertically
+                tw, th = self.draw.textsize(draw_seg, font=font)
+                if is_continuation:
+                    th = self.last_line_height
+                center_y = y_bottom + ((self.line_height - th) / 2)
+                # Draw text
+                self.draw.text((self.cur_x, center_y), draw_seg, font=font, fill=color)
+                # Account for drawn text
+                self.cur_x += tw
+                line = line[cols_remaining:]
+                self.last_line_height = th
+
+                # Advance line if text is remaining
+                if line:
+                    self.new_line()
+
+            last_draw_x = self.cur_x
+            last_draw_y = self.cur_y
+
+            # Advance line if there are more lines
+            if idx != len(lines) - 1:
+                self.new_line()
+
+        # Return vertically centered ending position of this segment
+        return last_draw_x, last_draw_y - self.line_height / 2
