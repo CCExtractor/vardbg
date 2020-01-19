@@ -82,11 +82,12 @@ class FrameRenderer:
         w, h = self.draw.textsize("A", font=self.body_font)
         hw, hh = self.draw.textsize("A", font=self.head_font)
         _, mh = self.draw.textsize("`^Ag", font=self.body_font)
+        _, ch = self.draw.textsize("1p", font=self.caption_font)
 
         # Code body size
         self.line_height = mh * self.cfg.line_height
         self.body_cols = (self.cfg.var_x - self.cfg.sect_padding * 2) // w
-        self._body_rows = (self.cfg.out_y - self.cfg.sect_padding * 2) / self.line_height
+        self._body_rows = (self.cfg.out_y - self.cfg.sect_padding * 2 - ch) / self.line_height
         self.body_rows = int(self._body_rows)
 
         # Output body start position
@@ -104,7 +105,7 @@ class FrameRenderer:
 
         # Columns and rows for last variable section
         self.vars_cols = (self.cfg.w - self.cfg.var_x - self.cfg.sect_padding * 2) // w
-        self.vars_rows = int((self.cfg.ovar_y - self.cfg.sect_padding * 2) / self.line_height)
+        self.vars_rows = int((self.cfg.ovar_y - self.cfg.head_padding * 2 - hh) / self.line_height)
 
         # Top-left X and Y for other variables section
         self.ovars_x = self.vars_x
@@ -207,7 +208,7 @@ class FrameRenderer:
                     wrapped_lines.append((line_seg, highlighted))
 
         # Calculate start and end display indexes with an equivalent number of lines on both sides for context
-        ctx_side_lines = self._body_rows / 2 - 1
+        ctx_side_lines = (self._body_rows - 1) / 2
         start_idx = round(cur_idx - ctx_side_lines)
         end_idx = round(cur_idx + ctx_side_lines)
         # Accommodate for situations where not enough lines are available at the beginning
@@ -215,14 +216,14 @@ class FrameRenderer:
             start_extra = abs(start_idx)
             end_idx += start_extra
             start_idx = 0
-        end_idx += 1
         # Slice selected section
         display_lines = wrapped_lines[start_idx:end_idx]
 
         # Construct painter
-        xy_start = self.cfg.sect_padding
+        x_start = self.cfg.sect_padding
+        y_start = self.cfg.sect_padding + self.line_height
         x_end = self.cfg.var_x - self.cfg.sect_padding
-        painter = TextPainter(self, xy_start, xy_start + self.line_height, self.body_cols, self.body_rows, x_end=x_end)
+        painter = TextPainter(self, x_start, y_start, self.body_cols, self.body_rows, x_end=x_end, show_truncate=False)
 
         # Render processed lines
         for i, (line, highlighted) in enumerate(display_lines):
@@ -234,12 +235,12 @@ class FrameRenderer:
         painter.write("\n".join(lines))
 
     def draw_exec(self, nr_times, cur, avg, total):
-        x = self.cfg.sect_padding
-        # Padding + body
-        y = self.cfg.sect_padding + self.line_height * self.body_rows
-
         plural = "" if nr_times == 1 else "s"
         text = f"Line executed {nr_times} time{plural} — current time elapsed: {cur}, average: {avg}, total: {total}"
+
+        _, h = self.draw.textsize(text, font=self.caption_font)
+        x = self.cfg.sect_padding
+        y = self.cfg.out_y - self.cfg.sect_padding - h
         self.draw.text((x, y), text, font=self.caption_font)
 
     def draw_last_var(self, state):
