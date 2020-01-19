@@ -103,14 +103,14 @@ class FrameRenderer:
 
     def calc_sizes(self):
         # Calculate text sizes
-        w, h = self.draw.textsize("A", font=self.body_font)
+        w = self.draw.textsize("A" * 1000, font=self.body_font)[0] / 1000
         hw, hh = self.draw.textsize("A", font=self.head_font)
         _, mh = self.draw.textsize("`^Ag", font=self.body_font)
         _, ch = self.draw.textsize("1p", font=self.caption_font)
 
         # Code body size
         self.line_height = mh * self.cfg.line_height
-        self.body_cols = round((self.cfg.var_x - self.cfg.sect_padding * 2) / w)
+        self.body_cols = int((self.cfg.var_x - self.cfg.sect_padding * 2) / w)
         self._body_rows = (self.cfg.out_y - self.cfg.sect_padding * 2 - ch) / self.line_height
         self.body_rows = int(self._body_rows)
 
@@ -128,7 +128,7 @@ class FrameRenderer:
         self.vars_y = self.cfg.head_padding * 2 + hh
 
         # Columns and rows for last variable section
-        self.vars_cols = (self.cfg.w - self.cfg.var_x - self.cfg.sect_padding * 2) // w
+        self.vars_cols = int((self.cfg.w - self.cfg.var_x - self.cfg.sect_padding * 2) / w)
         self.vars_rows = int((self.cfg.ovar_y - self.cfg.head_padding * 2 - hh) / self.line_height)
 
         # Top-left X and Y for other variables section
