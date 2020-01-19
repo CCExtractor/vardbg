@@ -70,6 +70,7 @@ class TextPainter:
                 self.draw.text((self.cur_x, center_y), draw_seg, font=font, fill=color)
                 # Account for drawn text
                 self.cur_x += tw
+                self.cols_used += len(draw_seg)
                 line = line[cols_remaining:]
                 self.last_line_y = center_y
 

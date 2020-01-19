@@ -4,6 +4,10 @@ import statistics
 import textwrap
 from pathlib import Path
 
+import pygments
+from pygments.lexers.python import PythonLexer
+from pygments.token import Token
+
 from ... import render
 from ..writer import Writer
 from .renderer import FrameRenderer
@@ -31,6 +35,20 @@ def wrap_text(text, cols, rows=None):
     return wrapped_lines
 
 
+def list_split(lst, sep):
+    new_lst = []
+    cur_seg = []
+
+    for elem in lst:
+        cur_seg.append(elem)
+
+        if elem == sep:
+            new_lst.append(cur_seg)
+            cur_seg = []
+
+    return new_lst
+
+
 class VideoWriter(Writer):
     def __init__(self, path, config_path):
         # File contents
@@ -46,7 +64,8 @@ class VideoWriter(Writer):
         if path in self.file_cache:
             return self.file_cache[path]
 
-        lines = Path(path).read_text().splitlines()
+        lexed = pygments.lex(Path(path).read_text(), PythonLexer())
+        lines = list_split(lexed, (Token.Text, "\n"))
         self.file_cache[path] = lines
         return lines
 
