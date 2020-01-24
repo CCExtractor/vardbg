@@ -1,4 +1,5 @@
 import abc
+import platform
 import time
 from typing import TYPE_CHECKING
 
@@ -8,6 +9,26 @@ from . import internal
 
 if TYPE_CHECKING:
     from .debugger import Debugger
+
+
+# Helper to call a function from the time module with nanosecond precision if possible, and lower prrcision otherwise
+def _time_wrap_ns(sym_base):
+    sym_ns = sym_base + "_ns"
+    if hasattr(time, sym_ns):
+        # Use ns function if possible
+        return getattr(time, sym_ns)
+    else:
+        # Otherwise, create a wrapper to convert it
+        # This is necessary on Python < 3.7
+        func = getattr(time, sym_base)
+        return lambda: int(func() * 1_000_000_000)
+
+
+# Use performance counter on Windows and process time on others for max precision (ref: PEP-564)
+if platform.system() == "Windows":
+    get_time_ns = _time_wrap_ns("perf_counter")
+else:
+    get_time_ns = _time_wrap_ns("process_time")
 
 
 class Profiler(abc.ABC):
@@ -25,10 +46,10 @@ class Profiler(abc.ABC):
         super().__init__()
 
     def profile_start_frame(self: "Debugger"):
-        self.prev_frame_start_time = time.time_ns()
+        self.prev_frame_start_time = get_time_ns()
 
     def profile_complete_frame(self: "Debugger", prev_frame_info):
-        exec_time = time.time_ns() - self.prev_frame_start_time
+        exec_time = get_time_ns() - self.prev_frame_start_time
 
         if prev_frame_info in self.frame_exec_times:
             self.frame_exec_times[prev_frame_info].append(exec_time)
