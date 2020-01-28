@@ -10,9 +10,13 @@ def parse_args():
         description="A simple Python debugger and profiler that can generate animated visualizations of program flow."
     )
 
-    parser.add_argument("file", type=str, metavar="FILE", help="Python file to debug or JSON file to replay")
+    parser.add_argument("file", metavar="FILE", help="Python file to debug or JSON file to replay")
     parser.add_argument(
-        "-n", "--function", nargs="?", type=str, help="function to run from the given file (if applicable)"
+        "-n",
+        "--function",
+        nargs="?",
+        default="main",
+        help="function to run from the given file (if applicable, default main)",
     )
     parser.add_argument(
         "-o",
@@ -94,9 +98,6 @@ def main():
         # JSON file means to replay, not debug
         return do_replay(args)
     else:
-        if args.function is None:
-            args.function = "main"
-
         # Load file as module and debug
         mod_name = Path(args.file).stem
         spec = importlib.util.spec_from_file_location(mod_name, args.file)

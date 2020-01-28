@@ -60,7 +60,7 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -n [FUNCTION], --function [FUNCTION]
-                        function to run from the given file (if applicable)
+                        function to run from the given file (if applicable, default main)
   -o [OUTPUT], --output-file [OUTPUT]
                         path to write JSON output file to (will be truncated/created if necessary)
   -v [VIDEO], --video [VIDEO]
