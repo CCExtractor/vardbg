@@ -58,9 +58,9 @@ class Profiler(abc.ABC):
             self.out.write_frame_exec(prev_frame_info, exec_times[-1], exec_times)
 
     def profile_start_exec(self: "Debugger"):
-        self.exec_start_time = time.time_ns()
+        self.exec_start_time = get_time_ns()
 
     def profile_end_exec(self: "Debugger"):
-        self.exec_stop_time = time.time_ns()
+        self.exec_stop_time = get_time_ns()
 
     internal.add_funcs(profile_start_exec, profile_end_exec)
