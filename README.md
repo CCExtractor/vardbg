@@ -36,25 +36,23 @@ All of the program's options are documented in the usage help:
 
 ```
 $ vardbg --help
-usage: vardbg [-h] [-f [FILE]] [-n [FUNCTION]] [-o [OUTPUT_FILE]] [-v [PATH]] [-c [CONFIG]]
-              [-a [ARGS [ARGS ...]]] [-p] [-P]
+usage: vardbg [-h] [-n [FUNCTION]] [-o [OUTPUT]] [-v [VIDEO]] [-c [CONFIG]] [-a [ARGS [ARGS ...]]] [-p] [-P] FILE
 
-A simple debugger that traces local variable changes, lines, and times.
+A simple Python debugger and profiler that can generate animated visualizations of program flow.
+
+positional arguments:
+  FILE                  Python file to debug or JSON file to replay
 
 optional arguments:
   -h, --help            show this help message and exit
-  -f [FILE], --file [FILE]
-                        Python file to debug, or JSON result file to read
   -n [FUNCTION], --function [FUNCTION]
                         function to run from the given file (if applicable)
-  -o [OUTPUT_FILE], --output-file [OUTPUT_FILE]
-                        path to write JSON output file to, default debug_results.json (will be truncated if it
-                        already exists and created otherwise)
-  -v [PATH], --video [PATH]
-                        path to write a video representation of the program execution to (MP4 and GIF formats
-                        are supported, depending on file extension)
+  -o [OUTPUT], --output-file [OUTPUT]
+                        path to write JSON output file to (will be truncated/created if necessary)
+  -v [VIDEO], --video [VIDEO]
+                        path to write a video representation of the program flow to (supports MP4, GIF, and WebP formats based on file extension)
   -c [CONFIG], --video-config [CONFIG]
-                        path to the TOML config for the video output format, default video.toml
+                        path to the TOML video output config
   -a [ARGS [ARGS ...]], --args [ARGS [ARGS ...]]
                         list of arguments to pass to the running program
   -p, --absolute-paths  use absolute paths instead of relative ones
@@ -65,13 +63,13 @@ optional arguments:
 For example, this command will debug the function `quick_sort` from the file `sort.py` with the arguments `9 3 5 1` and create a JSON file called `sort1.json`:
 
 ```bash
-vardbg -f sort.py -n quick_sort -o sort1.json -a 9 3 5 1
+vardbg sort.py -n quick_sort -o qsort.json -a 9 3 5 1
 ```
 
 A video can then be generated from the above JSON:
 
 ```bash
-vardbg -f sort1.json -v sort_vis.mp4
+vardbg qsort.json -v sort_vis.mp4
 ```
 
 It is possible to generate videos live while running the debugged program, but this is discouraged because the overhead of video creation inflates execution times greatly and thus ruins profiler results. However, if profiling is not important to you, it is a valid use case.
