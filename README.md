@@ -46,44 +46,18 @@ The above instructions assume the use of a virtual environment to avoid interfer
 
 ## Usage
 
-All of the program's options are documented in the usage help:
+All of the debugger's subcommands and options are documented in the usage help, which is readily available on the command line.
 
-```
-$ vardbg --help
-usage: vardbg [-h] [-n [FUNCTION]] [-o [OUTPUT]] [-v [VIDEO]] [-c [CONFIG]] [-a [ARGS [ARGS ...]]] [-p] [-P] FILE
-
-A simple Python debugger and profiler that can generate animated visualizations of program flow.
-
-positional arguments:
-  FILE                  Python file to debug or JSON file to replay
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -n [FUNCTION], --function [FUNCTION]
-                        function to run from the given file (if applicable, default main)
-  -o [OUTPUT], --output-file [OUTPUT]
-                        path to write JSON output file to (will be truncated/created if necessary)
-  -v [VIDEO], --video [VIDEO]
-                        path to write a video representation of the program flow to (supports MP4, GIF, and WebP formats based on file extension)
-  -c [CONFIG], --video-config [CONFIG]
-                        path to the TOML video output config
-  -a [ARGS [ARGS ...]], --args [ARGS [ARGS ...]]
-                        list of arguments to pass to the running program
-  -p, --absolute-paths  use absolute paths instead of relative ones
-  -P, --disable-live-profiler
-                        disable live profiler output during execution
-```
-
-For example, this command will debug the function `quick_sort` from the file `sort.py` with the arguments `9 3 5 1` and create a JSON file called `sort1.json`:
+For example, this command will debug the function `quick_sort` from the file `sort.py` with the arguments `9 3 5 1` and record the session to a JSON file named `sort1.json`:
 
 ```bash
-vardbg sort.py -n quick_sort -o qsort.json -a 9 3 5 1
+vardbg run sort.py quick_sort -o qsort.json -a 9 -a 3 -a 5 -a 1
 ```
 
-A video can then be generated from the above JSON:
+A video can then be generated from the above recording:
 
 ```bash
-vardbg qsort.json -v sort_vis.mp4
+vardbg replay qsort.json -v sort_vis.mp4
 ```
 
 It is possible to generate videos live while running the debugged program, but this is discouraged because the overhead of video creation inflates execution times greatly and thus ruins profiler results. However, if profiling is not important to you, it is a valid use case.
