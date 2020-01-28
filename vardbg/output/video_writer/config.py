@@ -1,3 +1,4 @@
+import collections.abc
 from pathlib import Path
 
 import toml
@@ -10,13 +11,28 @@ ASSETS_PATH = FILE_PATH / ".." / ".." / "assets"
 DEFAULT_CFG_PATH = FILE_PATH / "default_config.toml"
 
 
-def load_data(path):
-    # Just return default if none specified
-    if not path:
-        return DEFAULT_CFG_PATH.read_text()
+# Source: https://stackoverflow.com/a/3233356
+def recursive_update(base, new):
+    for k, v in new.items():
+        if isinstance(v, collections.abc.Mapping):
+            base[k] = recursive_update(base.get(k, {}), v)
+        else:
+            base[k] = v
 
-    # Parse and read (we don't catch exceptions here to prevent unintended behavior)
-    return Path(path).read_text()
+    return base
+
+
+def load_data(path):
+    base = toml.loads(DEFAULT_CFG_PATH.read_text())
+
+    # Just return default if there's no custom data
+    if not path:
+        return base
+
+    # Load and merge custom data
+    overlay = toml.loads(Path(path).read_text())
+    recursive_update(base, overlay)
+    return base
 
 
 def sub_path(path):
@@ -62,10 +78,9 @@ class Config:
     def __init__(self, config_path):
         # Load config
         self.data = load_data(config_path)
-        self.config = toml.loads(self.data)
 
         # Extract values
-        general = self.config["general"]
+        general = self.data["general"]
         self.w = general["width"]
         self.h = general["height"]
         self.fps = general["fps"]
@@ -74,7 +89,7 @@ class Config:
         self.intro_time = general["intro_time"]
         self.watermark = general["watermark"]
 
-        sizes = self.config["sizes"]
+        sizes = self.data["sizes"]
         self.var_x = calc_frac(self.w, sizes["code_width"])
         self.out_y = calc_frac(self.h, sizes["code_height"])
         self.ovar_y = calc_frac(self.h, sizes["last_variable_height"])
@@ -84,7 +99,7 @@ class Config:
 
         self.line_height = sizes["line_height"]
 
-        fonts = self.config["fonts"]
+        fonts = self.data["fonts"]
         self.font_body = (sub_path(fonts["body"]), fonts["body_size"])
         self.font_body_bold = (sub_path(fonts["body_bold"]), fonts["body_size"])
         self.font_caption = (sub_path(fonts["caption"]), fonts["caption_size"])
