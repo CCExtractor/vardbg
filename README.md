@@ -8,7 +8,7 @@ This project was created during [Google Code-in](https://codein.withgoogle.com/)
 
 ## Demo
 
-![Demo Video](https://user-images.githubusercontent.com/7930239/72689524-12691180-3ac7-11ea-9547-861454b1496d.gif)
+![Demo Video](https://user-images.githubusercontent.com/7930239/73240421-c156be80-4153-11ea-88a9-8d08d0da816a.gif)
 
 ## Features
 
