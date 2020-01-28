@@ -59,17 +59,11 @@ def run(file, function, arguments, output, video, video_config, absolute_paths, 
     # Get the function here regardless of which path we took above
     func = getattr(mod, function, None)
     if func is None:
-        # Check how many functions are present in the module
-        func_syms = [sym for sym in dir(mod) if callable(getattr(mod, sym))]
-        if len(func_syms) == 1:
-            # Safe to assume that the user wanted this one if it's the only one
-            f_sym = func_syms[0]
-            func = getattr(mod, f_sym)
-            warn(f"Unable to find function '{function}', falling back to the only one: '{f_sym}'\n")
-        else:
-            # Ambiguous if multiple, so bail out and let the user choose
-            err(f"Unable to find function '{function}' and multiple are present; aborting.")
-            return 1
+        err(f"Unable to find function '{function}'")
+
+    # Check whether it's callable
+    if not callable(func):
+        err(f"Object '{function}' is not callable")
 
     # Call the actual debugger with our parameters
     debugger.debug(
