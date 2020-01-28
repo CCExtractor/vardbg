@@ -38,7 +38,7 @@ pre-commit = "^1.21.0"
 isort = "^4.3.21"
 
 [tool.poetry.scripts]
-pyrobud = "vardbg.main:main"
+vardbg = "vardbg.main:main"
 
 [tool.black]
 line-length = 120
