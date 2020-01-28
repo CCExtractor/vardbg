@@ -1,28 +1,23 @@
-"""ANSI color codes for terminal output"""
+"""ANSI colors for terminal output"""
 
-RED = "\u001b[1;31m"
-GREEN = "\u001b[1;32m"
-BLUE = "\u001b[1;34m"
-YELLOW = "\u001b[1;33m"
-BOLD = "\u001b[1m"
-RESET = "\u001b[0m"
+import click
 
 
 def red(content):
-    return RED + str(content) + RESET
+    return click.style(str(content), fg="red", bold=True)
 
 
 def green(content):
-    return GREEN + str(content) + RESET
+    return click.style(str(content), fg="green", bold=True)
 
 
 def blue(content):
-    return BLUE + str(content) + RESET
+    return click.style(str(content), fg="blue", bold=True)
 
 
 def yellow(content):
-    return YELLOW + str(content) + RESET
+    return click.style(str(content), fg="yellow", bold=True)
 
 
 def bold(content):
-    return BOLD + str(content) + RESET
+    return click.style(str(content), bold=True)

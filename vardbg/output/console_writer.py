@@ -2,6 +2,8 @@ import numbers
 import statistics
 import sys
 
+import click
+
 from .. import ansi, data, render
 from .writer import Writer
 
@@ -16,7 +18,7 @@ class ConsoleWriter(Writer):
         self.stdout_last_len = 0
 
     def print(self, *args, **kwargs):
-        print(*args, **kwargs, file=self.file)
+        click.echo(*args, **kwargs, file=self.file)
 
     def write_cur_frame(self, frame_info, output):
         # Construct friendly filename + line number + function string
