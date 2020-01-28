@@ -10,6 +10,10 @@ DESC = "A simple Python debugger and profiler that can generate animated visuali
 VIDEO_HELP = (
     "Write a video representation of the program flow (supports MP4, GIF, and WebP formats based on file extension)."
 )
+VIDEO_RUN_HELP = (
+    VIDEO_HELP
+    + " Note that it is recommended to perform video generation while replaying rather running because its overhead ruins profiler results."
+)
 VIDEO_CONFIG_HELP = "TOML video config overlay to load."
 
 QUIET_DESC = "Silence console output."
@@ -25,13 +29,13 @@ def cli():
 @click.argument("function", required=False, default="main")
 @click.option("-a", "--arguments", multiple=True, metavar="ARGS", help="Arguments to pass to the program.")
 @click.option("-o", "--output", metavar="PATH", help="Write a JSON session recording.")
-@click.option("-v", "--video", metavar="PATH", help=VIDEO_HELP)
+@click.option("-v", "--video", metavar="PATH", help=VIDEO_RUN_HELP)
 @click.option("-c", "--video-config", metavar="PATH", help=VIDEO_CONFIG_HELP)
 @click.option(
     "-p", "--absolute-paths", default=False, is_flag=True, help="Use absolute paths instead of relative ones."
 )
 @click.option(
-    "-P", "--disable-live-profiler", default=False, is_flag=True, help="Disable live profiler output during execution.",
+    "-P", "--disable-live-profiler", default=False, is_flag=True, help="Disable live profiler output during execution."
 )
 @click.option("-q", "--quiet", default=False, is_flag=True, help=QUIET_DESC)
 def run(file, function, arguments, output, video, video_config, absolute_paths, disable_live_profiler, quiet):
