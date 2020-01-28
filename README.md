@@ -6,6 +6,10 @@ A simple Python debugger and profiler that generates animated visualizations of 
 
 This project was created during [Google Code-in](https://codein.withgoogle.com/) 2019 for [CCExtractor Development](https://ccextractor.org/).
 
+## Demo
+
+![Demo Video](https://user-images.githubusercontent.com/7930239/72689524-12691180-3ac7-11ea-9547-861454b1496d.gif)
+
 ## Features
 
 - Tracking the history of each variable and its contents
@@ -17,10 +21,6 @@ This project was created during [Google Code-in](https://codein.withgoogle.com/)
 - Exporting execution history in JSON format and replaying (including program output)
 - Creating videos that show program flow, execution times, variables (with relationships), and output
 - Writing videos in MP4, GIF, and WebP formats
-
-## Demo
-
-![Demo Video](https://user-images.githubusercontent.com/7930239/72689524-12691180-3ac7-11ea-9547-861454b1496d.gif)
 
 ## Installation
 
