@@ -39,7 +39,7 @@ python3 -m venv venv
 source venv/bin/activate
 pip install poetry
 poetry install .
-./debug.py [...]
+./debug.py
 ```
 
 The above instructions assume the use of a virtual environment to avoid interfering with the system install of Python.
