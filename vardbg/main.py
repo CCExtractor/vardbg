@@ -2,7 +2,7 @@ import argparse
 import importlib.util
 from pathlib import Path
 
-from . import ansi, debugger, test
+from . import ansi, debugger
 
 
 def parse_args():
@@ -10,7 +10,7 @@ def parse_args():
         description="A simple Python debugger and profiler that can generate animated visualizations of program flow."
     )
 
-    parser.add_argument("-f", "--file", nargs="?", type=str, help="Python file to debug, or JSON result file to read")
+    parser.add_argument("file", type=str, metavar="FILE", help="Python file to debug or JSON file to replay")
     parser.add_argument(
         "-n", "--function", nargs="?", type=str, help="function to run from the given file (if applicable)"
     )
@@ -18,24 +18,17 @@ def parse_args():
         "-o",
         "--output-file",
         nargs="?",
-        default="debug_results.json",
-        help="path to write JSON output file to, default debug_results.json (will be truncated if it already exists and created otherwise)",
+        metavar="OUTPUT",
+        help="path to write JSON output file to (will be truncated/created if necessary)",
     )
     parser.add_argument(
         "-v",
         "--video",
         nargs="?",
-        type=str,
-        metavar="PATH",
-        help="path to write a video representation of the program execution to (MP4, GIF, and WebP formats are supported, depending on file extension)",
+        help="path to write a video representation of the program flow to (supports MP4, GIF, and WebP formats based on file extension)",
     )
     parser.add_argument(
-        "-c",
-        "--video-config",
-        nargs="?",
-        default="video.toml",
-        metavar="CONFIG",
-        help="path to the TOML config for the video output format, default video.toml",
+        "-c", "--video-config", nargs="?", metavar="CONFIG", help="path to the TOML video output config",
     )
     parser.add_argument(
         "-a", "--args", nargs="*", default=[], metavar="ARGS", help="list of arguments to pass to the running program",
@@ -95,29 +88,19 @@ def do_replay(args):
 def main():
     args = parse_args()
 
-    # Module defaults to test
-    # Function defaults to test_func if no file specified, otherwise main
-    if args.file is None:
-        mod = test
-        if args.function is None:
-            args.function = "test_func"
-
-        # Debug the test function
-        return do_debug(args, mod)
+    # Use pathlib to get more info about the input file
+    file_path = Path(args.file)
+    if file_path.suffix == ".json":
+        # JSON file means to replay, not debug
+        return do_replay(args)
     else:
-        # Use pathlib to get more info
-        file_path = Path(args.file)
-        if file_path.suffix == ".json":
-            # JSON file means to replay, not debug
-            return do_replay(args)
-        else:
-            if args.function is None:
-                args.function = "main"
+        if args.function is None:
+            args.function = "main"
 
-            # Load file as module and debug
-            mod_name = Path(args.file).stem
-            spec = importlib.util.spec_from_file_location(mod_name, args.file)
-            mod = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(mod)
+        # Load file as module and debug
+        mod_name = Path(args.file).stem
+        spec = importlib.util.spec_from_file_location(mod_name, args.file)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
 
-            return do_debug(args, mod)
+        return do_debug(args, mod)

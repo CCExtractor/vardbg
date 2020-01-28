@@ -13,7 +13,7 @@ def get_tau():
 
 
 # Example function to debug
-def test_func():  # sourcery off
+def main():  # sourcery off
     # Print given arguments
     print("Arguments:", " ".join(sys.argv[1:]))
 
@@ -73,3 +73,7 @@ def test_func():  # sourcery off
     # To facilitate verifying the debugger's values
     print("\nFinal test values:")
     print("\n".join(f"  {var} = {repr(val)}" for var, val in locals().items()))  # Convoluted to avoid mutating locals
+
+
+if __name__ == "__main__":
+    main()
