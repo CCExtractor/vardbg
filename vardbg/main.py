@@ -19,6 +19,15 @@ VIDEO_CONFIG_HELP = "TOML video config overlay to load."
 QUIET_DESC = "Silence console output."
 
 
+def err(message):
+    click.secho(message, fg="red", bold=True)
+    click.get_current_context().abort()
+
+
+def warn(message):
+    click.secho(message, fg="yellow", bold=True)
+
+
 @click.group(help=DESC, context_settings={"help_option_names": ("-h", "--help")})
 def cli():
     pass
@@ -42,6 +51,8 @@ def run(file, function, arguments, output, video, video_config, absolute_paths, 
     # Load file as module
     mod_name = Path(file).stem
     spec = importlib.util.spec_from_file_location(mod_name, file)
+    if spec is None:
+        err(f"Module '{file}' not found")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
 
@@ -54,16 +65,10 @@ def run(file, function, arguments, output, video, video_config, absolute_paths, 
             # Safe to assume that the user wanted this one if it's the only one
             f_sym = func_syms[0]
             func = getattr(mod, f_sym)
-            click.secho(
-                f"Unable to find function '{function}', falling back to the only one: '{f_sym}'\n",
-                fg="yellow",
-                bold=True,
-            )
+            warn(f"Unable to find function '{function}', falling back to the only one: '{f_sym}'\n")
         else:
             # Ambiguous if multiple, so bail out and let the user choose
-            click.secho(
-                f"Unable to find function '{function}' and multiple are present; aborting.", fg="red", bold=True
-            )
+            err(f"Unable to find function '{function}' and multiple are present; aborting.")
             return 1
 
     # Call the actual debugger with our parameters
