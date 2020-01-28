@@ -26,22 +26,22 @@ section_padding = 20
 line_height = 1.2
 
 [fonts]
-# Paths that start with $VARDBG are relative to the debugger's root directory
+# "$ASSETS" refers to the built-in assets directory
 # Sizes are in pixels
 
 # Font used for the main code body (including a bold version)
-body = "$VARDBG/fonts/FiraMono-Regular.ttf"
-body_bold = "$VARDBG/fonts/FiraMono-Bold.ttf"
+body = "$ASSETS/fonts/FiraMono-Regular.ttf"
+body_bold = "$ASSETS/fonts/FiraMono-Bold.ttf"
 body_size = 16
 
 # Caption font, used to show execution times below the code as well as the watermark
-caption = "$VARDBG/fonts/Inter-Regular.ttf"
+caption = "$ASSETS/fonts/Inter-Regular.ttf"
 caption_size = 16
 
 # Heading font, used to show headings in the variable sections
-heading = "$VARDBG/fonts/Inter-Regular.ttf"
+heading = "$ASSETS/fonts/Inter-Regular.ttf"
 heading_size = 24
 
 # Intro font, used to render the intro screen
-intro = "$VARDBG/fonts/Inter-Bold.ttf"
+intro = "$ASSETS/fonts/Inter-Bold.ttf"
 intro_size = 48

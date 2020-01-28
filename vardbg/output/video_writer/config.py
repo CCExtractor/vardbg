@@ -5,8 +5,9 @@ from pygments.formatter import Formatter
 from pygments.styles.monokai import MonokaiStyle
 from pygments.token import Token
 
-BASE_PATH = Path(__file__).parent / ".." / ".." / ".."
-DEFAULT_CFG_PATH = BASE_PATH / "config.toml"
+FILE_PATH = Path(__file__).parent
+ASSETS_PATH = FILE_PATH / ".." / ".." / "assets"
+DEFAULT_CFG_PATH = FILE_PATH / "default_config.toml"
 
 
 def load_data(path):
@@ -21,9 +22,9 @@ def load_data(path):
 
 
 def sub_path(path):
-    # Replace first $VARDBG with base path
-    if path.startswith("$VARDBG"):
-        path = path.replace("$VARDBG", str(BASE_PATH), 1)
+    # Expand $ASSETS to asset directory
+    if path.startswith("$ASSETS"):
+        path = path.replace("$ASSETS", str(ASSETS_PATH), 1)
 
     return path
 
