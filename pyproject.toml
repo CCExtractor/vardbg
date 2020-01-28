@@ -32,6 +32,7 @@ sortedcontainers = "^2.1.0"
 toml = "^0.10.0"
 pygments = "^2.5.2"
 click = "^7.0"
+colorama = "^0.4.3"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
