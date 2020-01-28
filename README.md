@@ -30,6 +30,20 @@ The latest tagged version can be obtained from PyPI:
 pip install vardbg
 ```
 
+Alternatively, one can clone this repository and run it directly after installing dependencies:
+
+```bash
+git clone https://github.com/CCExtractor/vardbg
+cd vardbg
+python3 -m venv venv
+source venv/bin/activate
+pip install poetry
+poetry install .
+./debug.py [...]
+```
+
+The above instructions assume the use of a virtual environment to avoid interfering with the system install of Python.
+
 ## Usage
 
 All of the program's options are documented in the usage help:
