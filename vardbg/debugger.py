@@ -14,6 +14,7 @@ class Debugger(DiffProcessor, Profiler, Replayer, Tracer):
         video_out_path=None,
         video_config=None,
         live_profiler_output=True,
+        quiet=False,
     ):
         # Arguments to pass to snippet (handled in run())
         self.args = args
@@ -25,7 +26,9 @@ class Debugger(DiffProcessor, Profiler, Replayer, Tracer):
         self.live_profiler_output = live_profiler_output
 
         # Output writers
-        writers = [output.ConsoleWriter()]
+        writers = []
+        if not quiet:
+            writers.append(output.ConsoleWriter())
         if json_out_path is not None:
             writers.append(output.JsonWriter(json_out_path))
         if video_out_path is not None:

@@ -12,6 +12,8 @@ VIDEO_HELP = (
 )
 VIDEO_CONFIG_HELP = "TOML video config overlay to load."
 
+QUIET_DESC = "Silence console output."
+
 
 @click.group(help=DESC, context_settings={"help_option_names": ("-h", "--help")})
 def cli():
@@ -31,7 +33,8 @@ def cli():
 @click.option(
     "-P", "--disable-live-profiler", default=False, is_flag=True, help="Disable live profiler output during execution.",
 )
-def run(file, function, arguments, output, video, video_config, absolute_paths, disable_live_profiler):
+@click.option("-q", "--quiet", default=False, is_flag=True, help=QUIET_DESC)
+def run(file, function, arguments, output, video, video_config, absolute_paths, disable_live_profiler, quiet):
     # Load file as module
     mod_name = Path(file).stem
     spec = importlib.util.spec_from_file_location(mod_name, file)
@@ -63,6 +66,7 @@ def run(file, function, arguments, output, video, video_config, absolute_paths, 
         video_out_path=video,
         video_config=video_config,
         live_profiler_output=not disable_live_profiler,
+        quiet=quiet,
     )
 
 
@@ -70,8 +74,9 @@ def run(file, function, arguments, output, video, video_config, absolute_paths, 
 @click.argument("file")
 @click.option("-v", "--video", metavar="PATH", help=VIDEO_HELP)
 @click.option("-c", "--video-config", metavar="PATH", help=VIDEO_CONFIG_HELP)
-def replay(file, video, video_config):
-    debugger.replay(file, video_out_path=video, video_config=video_config)
+@click.option("-q", "--quiet", default=False, is_flag=True, help=QUIET_DESC)
+def replay(file, video, video_config, quiet):
+    debugger.replay(file, video_out_path=video, video_config=video_config, quiet=quiet)
 
 
 def main():
