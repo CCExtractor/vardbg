@@ -54,11 +54,16 @@ def run(file, function, arguments, output, video, video_config, absolute_paths, 
             # Safe to assume that the user wanted this one if it's the only one
             f_sym = func_syms[0]
             func = getattr(mod, f_sym)
-            print(ansi.yellow(f"Unable to find function '{function}', falling back to the only one: '{f_sym}'"))
-            print()
+            click.secho(
+                f"Unable to find function '{function}', falling back to the only one: '{f_sym}'\n",
+                fg="yellow",
+                bold=True,
+            )
         else:
             # Ambiguous if multiple, so bail out and let the user choose
-            print(ansi.red(f"Unable to find function '{function}' and multiple are present; aborting."))
+            click.secho(
+                f"Unable to find function '{function}' and multiple are present; aborting.", fg="red", bold=True
+            )
             return 1
 
     # Call the actual debugger with our parameters
