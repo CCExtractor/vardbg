@@ -1,7 +1,7 @@
 [general]
 # Video width and height in pixels
-width = 1920
-height = 1080
+width = 1280
+height = 720
 # Frames per second, higher is faster (can be fractional)
 fps = 2
 
