@@ -1,3 +1,4 @@
+import numbers
 import statistics
 import sys
 
@@ -57,7 +58,7 @@ class ConsoleWriter(Writer):
 
         for var, values in var_history.items():
             # Check whether all the values were numbers
-            if all(isinstance(val.value, (int, float)) for val in values):
+            if all(isinstance(val.value, numbers.Number) for val in values):
                 # Give a min-max range for numbers
                 min_val = min(values, key=data.VarValue.value_getter)
                 max_val = max(values, key=data.VarValue.value_getter)

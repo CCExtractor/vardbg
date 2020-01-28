@@ -1,4 +1,5 @@
 import abc
+import collections.abc
 from typing import TYPE_CHECKING
 
 import dictdiffer
@@ -34,14 +35,18 @@ class DiffProcessor(abc.ABC):
             if not self.vars[wrapper].ignored:
                 # chg is a list of tuples with keys (index, key, etc.) and values
                 for key, val in chg:
-                    if isinstance(container, set):
+                    if isinstance(container, collections.abc.Set):
                         # Move value out of set if there's only 1
                         if len(val) == 1:
                             val = val.pop()
 
                         # Show it as an extension for sets
                         self.out.write_add(
-                            chg_name, val, self._get_history(wrapper), action="extended", plural=isinstance(val, set)
+                            chg_name,
+                            val,
+                            self._get_history(wrapper),
+                            action="extended",
+                            plural=isinstance(val, collections.abc.Set),
                         )
                     else:
                         # Render it as var[key] for lists, dicts, etc.
