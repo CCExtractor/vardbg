@@ -88,7 +88,13 @@ vardbg qsort.json -v sort_vis.mp4
 
 It is possible to generate videos live while running the debugged program, but this is discouraged because the overhead of video creation inflates execution times greatly and thus ruins profiler results. However, if profiling is not important to you, it is a valid use case.
 
-## Comments
+## Configuration
+
+The video generator has many options: resolution, speed, fonts, and sizes. These options can be modified using a [TOML](https://learnxinyminutes.com/docs/toml/) config file. The [default config](https://github.com/CCExtractor/vardbg/blob/master/vardbg/output/video_writer/default_config.toml) documents the available options, which can be customized in an minimal overlay config without having to duplicate the entire config. The config can then be used by passing the `-c` argument on the command line.
+
+An example of a simple overlay is the [config](https://github.com/CCExtractor/vardbg/blob/master/demo_config.toml) used to generate official demo videos for embedding in READMEs. This simple config increases the speed (FPS) slightly and adds an intro screen at the beginning of the video.
+
+## Behavior Control
 
 Special comments can be added to lines of code that define variables to control how vardbg handles said variable:
 
