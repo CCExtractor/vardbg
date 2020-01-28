@@ -11,14 +11,12 @@ DEFAULT_CFG_PATH = FILE_PATH / "default_config.toml"
 
 
 def load_data(path):
-    # Attempt to load file
-    try:
-        data = path.read_text()
-    except FileNotFoundError:
-        # Fall back to default config if not found
-        data = DEFAULT_CFG_PATH.read_text()
+    # Just return default if none specified
+    if not path:
+        return DEFAULT_CFG_PATH.read_text()
 
-    return data
+    # Parse and read (we don't catch exceptions here to prevent unintended behavior)
+    return Path(path).read_text()
 
 
 def sub_path(path):
@@ -63,7 +61,7 @@ def load_style(style):
 class Config:
     def __init__(self, config_path):
         # Load config
-        self.data = load_data(Path(config_path))
+        self.data = load_data(config_path)
         self.config = toml.loads(self.data)
 
         # Extract values
