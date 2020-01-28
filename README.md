@@ -42,6 +42,12 @@ poetry install .
 ./debug.py
 ```
 
+It can also be installed from the repository:
+
+```bash
+pip install .
+```
+
 The above instructions assume the use of a virtual environment to avoid interfering with the system install of Python.
 
 ## Usage
