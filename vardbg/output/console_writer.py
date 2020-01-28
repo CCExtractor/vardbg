@@ -11,7 +11,7 @@ from .writer import Writer
 class ConsoleWriter(Writer):
     def __init__(self, file=None):
         # Output file
-        self.file = file or sys.stdout
+        self.file = file or click.get_text_stream("stdout")
         # Current line output prefix
         self.cur_line = ""
         # Last stdout output length
