@@ -1,5 +1,5 @@
 [general]
 fps = 1.5
 
-intro_text = "Bubble Sort"
+intro_text = "Insertion Sort"
 intro_time = 1
