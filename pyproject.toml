@@ -33,6 +33,7 @@ toml = "^0.10.0"
 pygments = "^2.5.2"
 click = "^7.0"
 colorama = "^0.4.3"
+imageio = "^2.6.1"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
