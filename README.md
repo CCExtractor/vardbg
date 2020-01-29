@@ -10,7 +10,7 @@ This project was created during [Google Code-in](https://codein.withgoogle.com/)
 
 ## Demo
 
-![Insertion Sort Demo](https://kdrag0n.dev/vardbg/insert.webp)
+![Insertion Sort Demo](https://kdrag0n.dev/vardbg/insert.gif)
 
 ## Features
 
