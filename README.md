@@ -1,6 +1,6 @@
 # vardbg
 
-![PyPI version](https://img.shields.io/pypi/v/vardbg)
+[![Available on PyPI](https://img.shields.io/pypi/v/vardbg)](https://pypi.org/project/vardbg/)
 
 A simple Python debugger and profiler that generates animated visualizations of program flow. It is meant to help with learning algorithms by allowing you to visualize what the algorithms are doing.
 
