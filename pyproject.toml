@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vardbg"
-version = "0.11.5"
+version = "0.11.6"
 description = "A simple Python debugger and profiler that generates animated visualizations of program flow."
 authors = ["Danny Lin <danny@kdrag0n.dev>"]
 license = "MIT"
