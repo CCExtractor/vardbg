@@ -10,7 +10,7 @@ This project was created during [Google Code-in](https://codein.withgoogle.com/)
 
 ## Demo
 
-![Demo Video](https://user-images.githubusercontent.com/7930239/73277500-1b30a600-419f-11ea-9f86-8c01bba78d7d.gif)
+![Insertion Sort Demo](https://user-images.githubusercontent.com/7930239/73331199-ead91e00-4217-11ea-939a-54e230827019.gif)
 
 ## Features
 
