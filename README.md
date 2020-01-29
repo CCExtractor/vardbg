@@ -10,7 +10,7 @@ This project was created during [Google Code-in](https://codein.withgoogle.com/)
 
 ## Demo
 
-![Insertion Sort Demo](https://kdrag0n.dev/vardbg/insert.gif)
+![Insertion Sort Demo](https://user-images.githubusercontent.com/7930239/73394845-3aa8fb00-4293-11ea-8477-6590cdeab5eb.gif)
 
 ## Features
 
