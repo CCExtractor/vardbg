@@ -3,3 +3,6 @@ fps = 1.5
 
 intro_text = "Insertion Sort"
 intro_time = 1
+
+[sizes]
+last_variable_height = [3, 8]
