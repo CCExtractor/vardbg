@@ -83,6 +83,8 @@ Special comments can be added to lines of code that define variables to control 
 - `# vardbg: ignore` — do not display this variable or track its values
 - `# vardbg: ref lst[i]` — treat variable `i` as the index/key of an element in container `lst` (only shown in videos)
 
+Specifying the name of the variable may appear to be redundant, but there are two reasons behind this: reliably parsing all code that defines variables is very hard (there are more possible methods than one might think — loops, unpacking, direct assignments, `exec` calls, etc.), and more than one variable can be declared on a line. For example, tuple unpacking and function arguments are common occurrences of multiple variables being added on a single line. Thus, specifying the variable name in references is mandatory to prevent ambiguity.
+
 ## Contributing
 
 Feel free to contribute to this project! You can add features, fix bugs, or make any other improvements you see fit. We just ask that you follow the [code style guidelines](https://github.com/CCExtractor/vardbg/blob/master/CODE_STYLE.md) to keep the code consistent and coherent. These guidelines can easily be enforced before pushing with the [pre-commit](https://pre-commit.com/) framework, which can install Git pre-commit hooks with the `pre-commit install` command.
