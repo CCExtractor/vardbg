@@ -1,8 +1,8 @@
 import copy
-import time
 
 import jsonpickle
 
+from ..timing import wall_time
 from .writer import Writer
 
 NEW_FRAME = "new_frame"
@@ -25,7 +25,7 @@ class JsonWriter(Writer):
         return self._step
 
     def write_event(self, evt_name, **kwargs):
-        event = {"step": self.step(), "time": time.time_ns(), "event": evt_name}
+        event = {"step": self.step(), "time": wall_time(), "event": evt_name}
         event.update(kwargs)
 
         self.data["events"].append(event)
