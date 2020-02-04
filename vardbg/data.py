@@ -11,6 +11,11 @@ def _get_path(orig_path, relative):
             return _relative_path_cache[orig_path]
         else:
             rel = os.path.relpath(orig_path)
+            # Once there's 3 .. parts, revert to an absolute path for brevity
+            if all(p == ".." for p in Path(rel).parts[:3]):
+                rel = orig_path
+
+            # Save path to cache and return
             _relative_path_cache[orig_path] = rel
             return rel
     else:
