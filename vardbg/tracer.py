@@ -141,8 +141,10 @@ class Tracer(abc.ABC):
         # Finalize variable history
         self.finalize_history()
 
-        # Write summary with collected data
-        self.out.write_summary(self.vars, self.exec_start_time, self.exec_stop_time, self.frame_exec_times)
+        # Write summaries with collected data
+        self.out.write_variable_summary(self.vars)
+        self.out.write_profiler_summary(self.frame_exec_times)
+        self.out.write_time_summary(self.exec_start_time, self.exec_stop_time)
         return ret
 
     internal.add_funcs(run)

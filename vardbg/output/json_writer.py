@@ -55,9 +55,14 @@ class JsonWriter(Writer):
     def write_remove(self, var, val, history, *, action):
         self.write_event(REMOVE_VARIABLE, var_name=var, value=val, history=copy.deepcopy(history), action=action)
 
-    def write_summary(self, var_history, exec_start_time, exec_stop_time, frame_exec_times):
-        # frame_exec_times is skipped because it can be readily reconstructed during replay
+    def write_variable_summary(self, var_history):
         self.data["var_history"] = list(var_history.items())
+
+    def write_profiler_summary(self, frame_exec_times):
+        # frame_exec_times is skipped because it can be readily reconstructed during replay
+        pass
+
+    def write_time_summary(self, exec_start_time, exec_stop_time):
         self.data["exec_start_time"] = exec_start_time
         self.data["exec_stop_time"] = exec_stop_time
 

@@ -130,8 +130,14 @@ class VideoWriter(Writer):
     def write_remove(self, var, val, history, *, action="removed"):
         self._write_action(var, val, self.render.RED, action, {"Last value": repr(val)}, history)
 
-    def write_summary(self, var_history, exec_start_time, exec_stop_time, frame_exec_times):
-        # Video doesn't have a summary
+    def write_variable_summary(self, var_history):
+        # Videos don't have summaries
+        pass
+
+    def write_profiler_summary(self, frame_exec_times):
+        pass
+
+    def write_time_summary(self, exec_start_time, exec_stop_time):
         pass
 
     def close(self):

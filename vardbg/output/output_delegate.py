@@ -25,9 +25,17 @@ class OutputDelegate(Writer):
         for writer in self.writers:
             writer.write_remove(*args, **kwargs)
 
-    def write_summary(self, *args, **kwargs):
+    def write_variable_summary(self, *args, **kwargs):
         for writer in self.writers:
-            writer.write_summary(*args, **kwargs)
+            writer.write_variable_summary(*args, **kwargs)
+
+    def write_profiler_summary(self, *args, **kwargs):
+        for writer in self.writers:
+            writer.write_profiler_summary(*args, **kwargs)
+
+    def write_time_summary(self, *args, **kwargs):
+        for writer in self.writers:
+            writer.write_time_summary(*args, **kwargs)
 
     def close(self, *args, **kwargs):
         for writer in self.writers:

@@ -54,7 +54,7 @@ class ConsoleWriter(Writer):
     def write_remove(self, var, val, history, *, action):
         self._write_action(var, ansi.red, action, f"(value: {render.val(val)})")
 
-    def _write_var_summary(self, var_history):
+    def write_variable_summary(self, var_history):
         self.print()
         self.print("Variables seen:")
 
@@ -84,7 +84,7 @@ class ConsoleWriter(Writer):
             if values.deleted_line is not None:
                 self.print(f"    ({ansi.red('deleted')} on {values.deleted_line})")
 
-    def _write_line_summary(self, frame_exec_times):
+    def write_profiler_summary(self, frame_exec_times):
         self.print()
         self.print("Lines executed:")
 
@@ -98,16 +98,11 @@ class ConsoleWriter(Writer):
                 f"{file_line} | {ansi.bold(nr_times)}x, avg {ansi.bold(avg_time)}, total {ansi.bold(total_time)}"
             )
 
-    def _write_time_summary(self, exec_start_time, exec_stop_time):
+    def write_time_summary(self, exec_start_time, exec_stop_time):
         self.print()
 
         exec_time = render.duration_ns(exec_stop_time - exec_start_time)
         self.print(f"Total execution time: {ansi.bold(exec_time)}")
-
-    def write_summary(self, var_history, exec_start_time, exec_stop_time, frame_exec_times):
-        self._write_var_summary(var_history)
-        self._write_line_summary(frame_exec_times)
-        self._write_time_summary(exec_start_time, exec_stop_time)
 
     def close(self):
         # We print everything live, so there's nothing to close

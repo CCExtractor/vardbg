@@ -23,5 +23,13 @@ class Writer(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def write_summary(self, var_history, exec_start_time, exec_stop_time, frame_exec_times):
+    def write_variable_summary(self, var_history):
+        pass
+
+    @abc.abstractmethod
+    def write_profiler_summary(self, frame_exec_times):
+        pass
+
+    @abc.abstractmethod
+    def write_time_summary(self, exec_start_time, exec_stop_time):
         pass
