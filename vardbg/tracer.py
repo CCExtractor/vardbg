@@ -2,6 +2,7 @@ import abc
 import copy
 import io
 import sys
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import dictdiffer
@@ -14,6 +15,9 @@ if TYPE_CHECKING:
 
 ALLOWED_EVENTS = {"call", "line", "return"}
 DISALLOWED_FUNC_NAMES = {"<genexpr>", "<listcomp>", "<dictcomp>", "<setcomp>"}
+
+# Known stdlib module path
+STDLIB_DIR = Path(abc.__file__).parent
 
 
 class FrameScope:
@@ -40,9 +44,20 @@ class Tracer(abc.ABC):
 
         # File content cache
         self.file_cache = {}
+        # stdlib status cache
+        self.stdlib_cache = {}
 
         # Propagate initialization to other mixins
         super().__init__()
+
+    def is_stdlib(self, path):
+        if path in self.stdlib_cache:
+            return self.stdlib_cache[path]
+        else:
+            # Compare parents with known stdlib path
+            status = STDLIB_DIR in Path(path).parents
+            self.stdlib_cache[path] = status
+            return status
 
     def trace_callback(self: "Debugger", frame, event, arg):
         """Frame execution callback"""
@@ -58,6 +73,10 @@ class Tracer(abc.ABC):
         # Ignore comprehensions and generator expressions
         # (they act strangely and most people wouldn't consider them to be functions)
         if code.co_name in DISALLOWED_FUNC_NAMES:
+            return
+
+        # Ignore stdlib code
+        if self.is_stdlib(code.co_filename):
             return
 
         # Ignore irrelevant events, but still attach to the next one
