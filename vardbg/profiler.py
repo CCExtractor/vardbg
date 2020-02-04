@@ -27,8 +27,8 @@ class Profiler(abc.ABC):
     def profile_start_frame(self: "Debugger"):
         self.prev_frame_start_time = profiler_time()
 
-    def profile_complete_frame(self: "Debugger", prev_frame_info):
-        exec_time = profiler_time() - self.prev_frame_start_time
+    def profile_complete_frame(self: "Debugger", prev_frame_info, end_time):
+        exec_time = end_time - self.prev_frame_start_time
 
         if prev_frame_info in self.frame_exec_times:
             self.frame_exec_times[prev_frame_info].append(exec_time)

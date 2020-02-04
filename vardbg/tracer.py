@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import dictdiffer
 
-from . import data, internal
+from . import data, internal, timing
 
 if TYPE_CHECKING:
     from .debugger import Debugger
@@ -47,6 +47,9 @@ class Tracer(abc.ABC):
     def trace_callback(self: "Debugger", frame, event, arg):
         """Frame execution callback"""
 
+        # Get time as early as possible
+        call_time = timing.profiler_time()
+
         # Ignore irrelevant events, but still attach to the next one
         if event not in ALLOWED_EVENTS:
             return self.trace_callback
@@ -82,7 +85,7 @@ class Tracer(abc.ABC):
         should_profile = scope.prev_event == "line"
         if should_profile:
             # Call profiler first to avoid counting the time it takes to copy locals
-            self.profile_complete_frame(scope.prev_frame_info)
+            self.profile_complete_frame(scope.prev_frame_info, call_time)
 
         # Get new locals and copy them so they don't change on the next frame
         scope.new_locals = copy.deepcopy(frame.f_locals)
