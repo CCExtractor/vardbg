@@ -12,7 +12,7 @@ VIDEO_HELP = (
 )
 VIDEO_RUN_HELP = (
     VIDEO_HELP
-    + " Note that it is recommended to perform video generation while replaying rather running because its overhead ruins profiler results."
+    + " Note that it is recommended to perform video generation while replaying rather running because its overhead distorts profiler results."
 )
 VIDEO_CONFIG_HELP = "TOML video config overlay to load."
 
@@ -30,7 +30,7 @@ def warn(message):
 
 class PrefixAliasGroup(click.Group):
     def get_command(self, ctx, cmd_name):
-        rv = click.Group.get_command(self, ctx, cmd_name)
+        rv = super().get_command(ctx, cmd_name)
         if rv is not None:
             return rv
 
@@ -38,7 +38,7 @@ class PrefixAliasGroup(click.Group):
         if not matches:
             return None
         elif len(matches) == 1:
-            return click.Group.get_command(self, ctx, matches[0])
+            return super().get_command(ctx, matches[0])
 
         ctx.fail("Too many matches: %s" % ", ".join(sorted(matches)))
 
@@ -58,11 +58,9 @@ def cli():
 @click.option(
     "-p", "--absolute-paths", default=False, is_flag=True, help="Use absolute paths instead of relative ones."
 )
-@click.option(
-    "-P", "--disable-live-profiler", default=False, is_flag=True, help="Disable live profiler output during execution."
-)
+@click.option("-P", "--enable-profiler", default=False, is_flag=True, help="Enable profiler output.")
 @click.option("-q", "--quiet", default=False, is_flag=True, help=QUIET_DESC)
-def run(file, function, arguments, output, video, video_config, absolute_paths, disable_live_profiler, quiet):
+def run(file, function, arguments, output, video, video_config, absolute_paths, enable_profiler, quiet):
     # Load file as module
     mod_name = Path(file).stem
     spec = importlib.util.spec_from_file_location(mod_name, file)
@@ -88,7 +86,7 @@ def run(file, function, arguments, output, video, video_config, absolute_paths, 
         json_out_path=output,
         video_out_path=video,
         video_config=video_config,
-        live_profiler_output=not disable_live_profiler,
+        profiler_output=enable_profiler,
         quiet=quiet,
     )
 
@@ -97,9 +95,10 @@ def run(file, function, arguments, output, video, video_config, absolute_paths, 
 @click.argument("file")
 @click.option("-v", "--video", metavar="PATH", help=VIDEO_HELP)
 @click.option("-c", "--video-config", metavar="PATH", help=VIDEO_CONFIG_HELP)
+@click.option("-P", "--enable-profiler", default=False, is_flag=True, help="Enable profiler output.")
 @click.option("-q", "--quiet", default=False, is_flag=True, help=QUIET_DESC)
-def replay(file, video, video_config, quiet):
-    debugger.replay(file, video_out_path=video, video_config=video_config, quiet=quiet)
+def replay(file, video, video_config, enable_profiler, quiet):
+    debugger.replay(file, video_out_path=video, video_config=video_config, profiler_output=enable_profiler, quiet=quiet)
 
 
 def main():

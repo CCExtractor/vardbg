@@ -13,7 +13,7 @@ class Debugger(DiffProcessor, Profiler, Replayer, Tracer):
         json_out_path=None,
         video_out_path=None,
         video_config=None,
-        live_profiler_output=True,
+        profiler_output=False,
         quiet=False,
     ):
         # Arguments to pass to snippet (handled in run())
@@ -22,8 +22,8 @@ class Debugger(DiffProcessor, Profiler, Replayer, Tracer):
         # Whether to use relative paths over absolute ones in output
         self.use_relative_paths = relative_paths
 
-        # Whether to print profiler output live during execution
-        self.live_profiler_output = live_profiler_output
+        # Whether to show profiler output
+        self.profiler_output = profiler_output
 
         # Output writers
         writers = []
