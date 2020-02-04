@@ -50,10 +50,6 @@ class Tracer(abc.ABC):
         # Get time as early as possible
         call_time = timing.profiler_time()
 
-        # Ignore irrelevant events, but still attach to the next one
-        if event not in ALLOWED_EVENTS:
-            return self.trace_callback
-
         # Ignore our internal functions
         code = frame.f_code
         if code in internal.INTERNAL_FUNC_CODES:
@@ -63,6 +59,10 @@ class Tracer(abc.ABC):
         # (they act strangely and most people wouldn't consider them to be functions)
         if code.co_name in DISALLOWED_FUNC_NAMES:
             return
+
+        # Ignore irrelevant events, but still attach to the next one
+        if event not in ALLOWED_EVENTS:
+            return self.trace_callback
 
         # Obtain frame scope
         if event == "call":
