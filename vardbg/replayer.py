@@ -51,7 +51,8 @@ class Replayer(abc.ABC):
     def replay_summary(self: "Debugger", data):
         self.vars.update(data["var_history"])
         self.out.write_variable_summary(self.vars)
-        self.out.write_profiler_summary(self.frame_exec_times)
+        if self.profiler_output:
+            self.out.write_profiler_summary(self.frame_exec_times)
         self.out.write_time_summary(data["exec_start_time"], data["exec_stop_time"])
 
     def replay(self: "Debugger", json_path):

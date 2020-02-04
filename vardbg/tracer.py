@@ -143,7 +143,8 @@ class Tracer(abc.ABC):
 
         # Write summaries with collected data
         self.out.write_variable_summary(self.vars)
-        self.out.write_profiler_summary(self.frame_exec_times)
+        if self.profiler_output:
+            self.out.write_profiler_summary(self.frame_exec_times)
         self.out.write_time_summary(self.exec_start_time, self.exec_stop_time)
         return ret
 
