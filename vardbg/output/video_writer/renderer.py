@@ -18,7 +18,7 @@ class FrameRenderer:
     GREEN = 1
     BLUE = 2
 
-    def __init__(self, path, config_path):
+    def __init__(self, path, config_path, show_profile):
         # Config
         self.cfg = Config(config_path)
         # Video encoder
@@ -42,6 +42,9 @@ class FrameRenderer:
 
         # Whether the watermark has been drawn on this frame
         self._watermark_drawn = False
+
+        # Whether to show profiler output
+        self.show_body_caption = show_profile
 
         # Sizes and positions to be calculated later
         # Code body size
@@ -106,7 +109,10 @@ class FrameRenderer:
         w = self.text_size(SAMPLE_CHARS, font=self.body_font)[0] / len(SAMPLE_CHARS)
         hw, hh = self.text_size("A", font=self.head_font)
         _, mh = self.text_size("`^Ag", font=self.body_font)
-        _, ch = self.text_size("1p", font=self.caption_font)
+        if self.show_body_caption:
+            _, ch = self.text_size("1p", font=self.caption_font)
+        else:
+            ch = 0
 
         # Code body size
         self.line_height = mh * self.cfg.line_height

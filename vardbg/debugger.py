@@ -32,7 +32,7 @@ class Debugger(DiffProcessor, Profiler, Replayer, Tracer):
         if json_out_path is not None:
             writers.append(output.JsonWriter(json_out_path))
         if video_out_path is not None:
-            writers.append(output.VideoWriter(video_out_path, video_config))
+            writers.append(output.VideoWriter(video_out_path, video_config, profiler_output))
         self.out = output.OutputDelegate(*writers)
 
         # Initialize mixins
