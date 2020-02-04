@@ -35,18 +35,23 @@ def wrap_text(text, cols, rows=None):
     return wrapped_lines
 
 
-def list_split(lst, sep):
-    new_lst = []
-    cur_seg = []
+def split_lexed_lines(lst):
+    lines = []
+    line = []
 
-    for elem in lst:
-        cur_seg.append(elem)
+    for tok, txt in lst:
+        while "\n" in txt:
+            nl_idx = txt.index("\n")
+            line_seg = txt[: nl_idx + 1]
+            line.append((tok, line_seg))
+            lines.append(line)
+            line = []
+            txt = txt[nl_idx + 1 :]
 
-        if elem == sep:
-            new_lst.append(cur_seg)
-            cur_seg = []
+        if txt:
+            line.append((tok, txt))
 
-    return new_lst
+    return lines
 
 
 class VideoWriter(Writer):
@@ -65,7 +70,7 @@ class VideoWriter(Writer):
             return self.file_cache[path]
 
         lexed = pygments.lex(Path(path).read_text(), PythonLexer())
-        lines = list_split(lexed, (Token.Text, "\n"))
+        lines = split_lexed_lines(lexed)
         self.file_cache[path] = lines
         return lines
 
