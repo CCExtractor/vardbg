@@ -154,11 +154,10 @@ testing = ["packaging", "importlib-resources"]
 [[package]]
 category = "dev"
 description = "Read resources from Python packages"
-marker = "python_version < \"3.7\""
 name = "importlib-resources"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
-version = "1.3.1"
+version = "1.4.0"
 
 [package.dependencies]
 [package.dependencies.importlib-metadata]
@@ -170,7 +169,7 @@ python = "<3.8"
 version = ">=0.4"
 
 [package.extras]
-docs = ["sphinx", "docutils (0.12)", "rst.linker"]
+docs = ["sphinx", "rst.linker", "jaraco.packaging"]
 
 [[package]]
 category = "dev"
@@ -415,8 +414,8 @@ importlib-metadata = [
     {file = "importlib_metadata-1.5.0.tar.gz", hash = "sha256:06f5b3a99029c7134207dd882428a66992a9de2bef7c2b699b5641f9886c3302"},
 ]
 importlib-resources = [
-    {file = "importlib_resources-1.3.1-py2.py3-none-any.whl", hash = "sha256:1dff36d42d94bd523eeb847c25c7dd327cb56686d74a26dfcc8d67c504922d59"},
-    {file = "importlib_resources-1.3.1.tar.gz", hash = "sha256:7f0e1b2b5f3981e39c52da0f99b2955353c5a139c314994d1126c2551ace9bdf"},
+    {file = "importlib_resources-1.4.0-py2.py3-none-any.whl", hash = "sha256:dd98ceeef3f5ad2ef4cc287b8586da4ebad15877f351e9688987ad663a0a29b8"},
+    {file = "importlib_resources-1.4.0.tar.gz", hash = "sha256:4019b6a9082d8ada9def02bece4a76b131518866790d58fdda0b5f8c603b36c2"},
 ]
 isort = [
     {file = "isort-4.3.21-py2.py3-none-any.whl", hash = "sha256:6e811fcb295968434526407adb8796944f1988c5b65e8139058f2014cbe100fd"},
