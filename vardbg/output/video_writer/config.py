@@ -3,7 +3,7 @@ from pathlib import Path
 
 import toml
 from pygments.formatter import Formatter
-from pygments.styles.monokai import MonokaiStyle
+from pygments.styles import get_style_by_name
 from pygments.token import Token
 
 FILE_PATH = Path(__file__).parent
@@ -106,7 +106,8 @@ class Config:
         self.font_heading = (sub_path(fonts["heading"]), fonts["heading_size"])
         self.font_intro = (sub_path(fonts["intro"]), fonts["intro_size"])
 
-        style = MonokaiStyle
+        theme = self.data["theme"]
+        style = get_style_by_name(theme["color_scheme"])
         self.styles = load_style(style)
 
         self.bg = parse_hex_color(style.background_color)
