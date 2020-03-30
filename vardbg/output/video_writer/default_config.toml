@@ -45,3 +45,43 @@ heading_size = 24
 # Intro font, used to render the intro screen
 intro = "$ASSETS/fonts/Inter-Bold.ttf"
 intro_size = 48
+
+[theme]
+# Color scheme to use
+# Available themes:
+#   - default
+#   - emacs
+#   - friendly
+#   - colorful
+#   - autumn
+#   - murphy
+#   - manni
+#   - monokai
+#   - perldoc
+#   - pastie
+#   - borland
+#   - trac
+#   - native
+#   - fruity
+#   - bw
+#   - vim
+#   - vs
+#   - tango
+#   - rrt
+#   - xcode
+#   - igor
+#   - paraiso-light
+#   - paraiso-dark
+#   - lovelace
+#   - algol
+#   - algol_nu
+#   - arduino
+#   - rainbow_dash
+#   - abap
+#   - solarized-dark
+#   - solarized-light
+#   - sas
+#   - stata
+#   - stata-light
+#   - stata-dark
+color_scheme = "monokai"
