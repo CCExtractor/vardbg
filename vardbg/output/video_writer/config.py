@@ -1,5 +1,6 @@
 import collections.abc
 from pathlib import Path
+import math
 
 import toml
 from pygments.formatter import Formatter
@@ -10,6 +11,8 @@ FILE_PATH = Path(__file__).parent
 ASSETS_PATH = FILE_PATH / ".." / ".." / "assets"
 DEFAULT_CFG_PATH = FILE_PATH / "default_config.toml"
 
+# List for colors in color_scheme
+color_list = []
 
 # Source: https://stackoverflow.com/a/3233356
 def recursive_update(base, new):
@@ -58,6 +61,17 @@ def parse_hex_color(string):
 
     return r, g, b, 255
 
+# Some color_scheme can have same txt and bg color
+def color_contrast(body_txt):
+    contrast = (int(body_txt[0] * 299) + int(body_txt[1] * 587) + int(body_txt[2] * 114)) / 1000
+    if (contrast >= 128):  
+        return (50,50,50,255) # return grey
+    else:
+        return (255,255,255,255) # return white
+
+# Calculate distance btw two color
+def color_similarity(base_col_val,oth_col_val):
+    return math.sqrt(sum((base_col_val[i]-oth_col_val[i])**2 for i in range(3)))
 
 def load_style(style):
     styles = {}
@@ -114,9 +128,17 @@ class Config:
         self.highlight = parse_hex_color(style.highlight_color)
         self.fg_divider = self.styles[Token.Generic.Subheading]["color"]
         self.fg_heading = self.styles[Token.Name]["color"]
-        self.fg_body = self.styles[Token.Text]["color"]
+        self.fg_body = color_contrast(self.bg)
         self.fg_watermark = self.styles[Token.Comment]["color"]
-
-        self.red = self.styles[Token.Operator]["color"]
-        self.green = self.styles[Token.Name.Function]["color"]
-        self.blue = self.styles[Token.Keyword]["color"]
+        
+        # Search best similar color in color_scheme
+        for token_style in style:    
+            if token_style[1]["color"] is not None and token_style[1]["color"] not in color_list:  
+                color_list.append(token_style[1]["color"])
+                hex_color_val = parse_hex_color(token_style[1]["color"])
+                if color_similarity((255,0,0,255),hex_color_val)<theme["max_red_dist"]:
+                    theme["max_red_dist"],self.red = color_similarity((255,0,0,255),hex_color_val),hex_color_val
+                if color_similarity((0,255,0,255),hex_color_val)<theme["max_green_dist"]:
+                    theme["max_green_dist"],self.green = color_similarity((0,255,0,255),hex_color_val),hex_color_val
+                if color_similarity((0,0,255,255),hex_color_val)<theme["max_blue_dist"]:
+                    theme["max_blue_dist"],self.blue = color_similarity((0,0,255,255),hex_color_val),hex_color_val
