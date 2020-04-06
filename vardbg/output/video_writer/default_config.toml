@@ -85,3 +85,8 @@ intro_size = 48
 #   - stata-light
 #   - stata-dark
 color_scheme = "monokai"
+
+# Maximum distance color can have with other color
+max_red_dist = 360
+max_green_dist = 360
+max_blue_dist = 360
