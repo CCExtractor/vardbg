@@ -43,7 +43,7 @@ def get_style_by_name(name):
         print(mod)
 
     try:
-        mod = __import__('vardbg.styles.' + mod, None, None, [cls])
+        mod = __import__('vardbg.assets.styles.' + mod, None, None, [cls])
     except ImportError:
         raise ClassNotFound("Could not find style module %r" % mod +
                          (builtin and ", though it should be builtin") + ".")
