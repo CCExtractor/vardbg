@@ -4,7 +4,7 @@ import math
 
 import toml
 from pygments.formatter import Formatter
-from pygments.styles import get_style_by_name
+from vardbg.assets.styles.default import DefaultStyle
 from pygments.token import Token
 
 FILE_PATH = Path(__file__).parent
@@ -79,11 +79,9 @@ def load_style(style):
 
     for token, params in formatter.style:
         color = parse_hex_color(params["color"]) if params["color"] else None
-        # Italic and underline styles aren't supported, so just use bold for them
-        bold = params["bold"] or params["italic"] or params["underline"]
 
         # Save style
-        styles[token] = {"color": color, "bold": bold}
+        styles[token] = {"color": color}
 
     return styles
 
@@ -120,8 +118,7 @@ class Config:
         self.font_heading = (sub_path(fonts["heading"]), fonts["heading_size"])
         self.font_intro = (sub_path(fonts["intro"]), fonts["intro_size"])
 
-        theme = self.data["theme"]
-        style = get_style_by_name(theme["color_scheme"])
+        style = DefaultStyle
         self.styles = load_style(style)
 
         self.bg = parse_hex_color(style.background_color)
@@ -131,14 +128,6 @@ class Config:
         self.fg_body = color_contrast(self.bg)
         self.fg_watermark = self.styles[Token.Comment]["color"]
         
-        # Search best similar color in color_scheme
-        for token_style in style:    
-            if token_style[1]["color"] is not None and token_style[1]["color"] not in color_list:  
-                color_list.append(token_style[1]["color"])
-                hex_color_val = parse_hex_color(token_style[1]["color"])
-                if color_similarity((255,0,0,255),hex_color_val)<theme["max_red_dist"]:
-                    theme["max_red_dist"],self.red = color_similarity((255,0,0,255),hex_color_val),hex_color_val
-                if color_similarity((0,255,0,255),hex_color_val)<theme["max_green_dist"]:
-                    theme["max_green_dist"],self.green = color_similarity((0,255,0,255),hex_color_val),hex_color_val
-                if color_similarity((0,0,255,255),hex_color_val)<theme["max_blue_dist"]:
-                    theme["max_blue_dist"],self.blue = color_similarity((0,0,255,255),hex_color_val),hex_color_val
+        self.red = self.styles[Token.Operator]["color"]
+        self.green = self.styles[Token.Name.Function]["color"]
+        self.blue = self.styles[Token.Keyword]["color"]
