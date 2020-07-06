@@ -38,7 +38,7 @@ imageio = "^2.6.1"
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
 pre-commit = "^2.1.1"
-isort = "^4.3.21"
+isort = "^5.0.4"
 
 [tool.poetry.scripts]
 vardbg = "vardbg.main:main"
