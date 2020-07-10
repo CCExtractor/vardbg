@@ -100,7 +100,7 @@ description = "File identification library for Python"
 name = "identify"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
-version = "1.4.21"
+version = "1.4.22"
 
 [package.extras]
 license = ["editdistance"]
@@ -389,8 +389,8 @@ filelock = [
     {file = "filelock-3.0.12.tar.gz", hash = "sha256:18d82244ee114f543149c66a6e0c14e9c4f8a1044b5cdaadd0f82159d6a6ff59"},
 ]
 identify = [
-    {file = "identify-1.4.21-py2.py3-none-any.whl", hash = "sha256:dac33eff90d57164e289fb20bf4e131baef080947ee9bf45efcd0da8d19064bf"},
-    {file = "identify-1.4.21.tar.gz", hash = "sha256:c4d07f2b979e3931894170a9e0d4b8281e6905ea6d018c326f7ffefaf20db680"},
+    {file = "identify-1.4.22-py2.py3-none-any.whl", hash = "sha256:a8b5484c47c2864c1b7e1456c56791ebef5705e0570b4b222b7c68b48b28d21c"},
+    {file = "identify-1.4.22.tar.gz", hash = "sha256:880afb45e2e2771433647d3fb7cd1e63dad59520323f8e6d62fef33d811fa3ad"},
 ]
 imageio = [
     {file = "imageio-2.9.0-py3-none-any.whl", hash = "sha256:3604d751f03002e8e0e7650aa71d8d9148144a87daf17cb1f3228e80747f2e6b"},
