@@ -162,7 +162,7 @@ description = "A Python utility / library to sort Python imports."
 name = "isort"
 optional = false
 python-versions = ">=3.6,<4.0"
-version = "5.1.0"
+version = "5.1.1"
 
 [package.extras]
 pipfile_deprecated_finder = ["pipreqs", "requirementslib", "tomlkit (>=0.5.3)"]
@@ -346,7 +346,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "0229930984adef9238feed4f0b8fef5ef3630a3fcf85e2d9defd027d61b3e281"
+content-hash = "c4215cc74bacfa1f36bd2dcde6a13dafdd0638bc39ecbf93f277fe75d2335f4e"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -403,8 +403,8 @@ importlib-resources = [
     {file = "importlib_resources-3.0.0.tar.gz", hash = "sha256:19f745a6eca188b490b1428c8d1d4a0d2368759f32370ea8fb89cad2ab1106c3"},
 ]
 isort = [
-    {file = "isort-5.1.0-py3-none-any.whl", hash = "sha256:1590a5f707fa72a12d91152f2f930c648ebc8b455405fade20716fbb939d5fbd"},
-    {file = "isort-5.1.0.tar.gz", hash = "sha256:b19b7ebce5e292507afa8fab30dd666011dd5ae8f4ef2a2d431751dc84c22140"},
+    {file = "isort-5.1.1-py3-none-any.whl", hash = "sha256:18aa2e5d9dd7314115baa20e81e242ee4a83f0e72f14c44a642749f69cc8dc26"},
+    {file = "isort-5.1.1.tar.gz", hash = "sha256:069aa3af9b51c7f67311710e70514e685e868cd71cc1c39e78a5264f0d048c1e"},
 ]
 jsonpickle = [
     {file = "jsonpickle-1.4.1-py2.py3-none-any.whl", hash = "sha256:8919c166bac0574e3d74425c7559434062002d9dfc0ac2afa6dc746ba4a19439"},
@@ -533,6 +533,7 @@ regex = [
     {file = "regex-2020.7.14-cp38-cp38-manylinux1_i686.whl", hash = "sha256:5ea81ea3dbd6767873c611687141ec7b06ed8bab43f68fad5b7be184a920dc99"},
     {file = "regex-2020.7.14-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:bbb332d45b32df41200380fff14712cb6093b61bd142272a10b16778c418e98e"},
     {file = "regex-2020.7.14-cp38-cp38-manylinux2010_i686.whl", hash = "sha256:c11d6033115dc4887c456565303f540c44197f4fc1a2bfb192224a301534888e"},
+    {file = "regex-2020.7.14-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:75aaa27aa521a182824d89e5ab0a1d16ca207318a6b65042b046053cfc8ed07a"},
     {file = "regex-2020.7.14-cp38-cp38-win32.whl", hash = "sha256:d6cff2276e502b86a25fd10c2a96973fdb45c7a977dca2138d661417f3728341"},
     {file = "regex-2020.7.14-cp38-cp38-win_amd64.whl", hash = "sha256:7a2dd66d2d4df34fa82c9dc85657c5e019b87932019947faece7983f2089a840"},
     {file = "regex-2020.7.14.tar.gz", hash = "sha256:3a3af27a8d23143c49a3420efe5b3f8cf1a48c6fc8bc6856b03f638abc1833bb"},
