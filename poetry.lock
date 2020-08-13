@@ -162,7 +162,7 @@ description = "A Python utility / library to sort Python imports."
 name = "isort"
 optional = false
 python-versions = ">=3.6,<4.0"
-version = "5.3.2"
+version = "5.4.1"
 
 [package.extras]
 colors = ["colorama (>=0.4.3,<0.5.0)"]
@@ -344,7 +344,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "afa36b549ba4c3011d3663637e7829cb680fa4c911e9811b773715149ae7cec9"
+content-hash = "ecc46e6688f79cf7f656e132ee5539ba43a15603f986deff375aa55948ce6047"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -401,8 +401,8 @@ importlib-resources = [
     {file = "importlib_resources-3.0.0.tar.gz", hash = "sha256:19f745a6eca188b490b1428c8d1d4a0d2368759f32370ea8fb89cad2ab1106c3"},
 ]
 isort = [
-    {file = "isort-5.3.2-py3-none-any.whl", hash = "sha256:5196bd2f5b23dc91215734b1c96c6d28390061d69860a948094c12635d6d64e6"},
-    {file = "isort-5.3.2.tar.gz", hash = "sha256:ba83762132a8661d3525f87a86549712fb7d8da79eeb452e01f327ada9e87920"},
+    {file = "isort-5.4.1-py3-none-any.whl", hash = "sha256:819fa99f2a9323025ade768e94b2e27447cd9b0a64595a90f21595e11151b788"},
+    {file = "isort-5.4.1.tar.gz", hash = "sha256:a4fb5fffc46494cda15e33a996c8e724f8e3db19682b84cc7c990b57f2941e9f"},
 ]
 jsonpickle = [
     {file = "jsonpickle-1.4.1-py2.py3-none-any.whl", hash = "sha256:8919c166bac0574e3d74425c7559434062002d9dfc0ac2afa6dc746ba4a19439"},
