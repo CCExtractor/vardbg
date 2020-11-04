@@ -93,7 +93,7 @@ python-versions = "*"
 
 [[package]]
 name = "identify"
-version = "1.5.8"
+version = "1.5.9"
 description = "File identification library for Python"
 category = "dev"
 optional = false
@@ -386,8 +386,8 @@ filelock = [
     {file = "filelock-3.0.12.tar.gz", hash = "sha256:18d82244ee114f543149c66a6e0c14e9c4f8a1044b5cdaadd0f82159d6a6ff59"},
 ]
 identify = [
-    {file = "identify-1.5.8-py2.py3-none-any.whl", hash = "sha256:fd6564cf079954c00b3a436c9f3bea74ddebf610310d94def10b4a10f11dc9eb"},
-    {file = "identify-1.5.8.tar.gz", hash = "sha256:77e34c6eb21f2d805e8d41140030fbc54e5f0502fae5c6c566173bf638313f74"},
+    {file = "identify-1.5.9-py2.py3-none-any.whl", hash = "sha256:5dd84ac64a9a115b8e0b27d1756b244b882ad264c3c423f42af8235a6e71ca12"},
+    {file = "identify-1.5.9.tar.gz", hash = "sha256:c9504ba6a043ee2db0a9d69e43246bc138034895f6338d5aed1b41e4a73b1513"},
 ]
 imageio = [
     {file = "imageio-2.9.0-py3-none-any.whl", hash = "sha256:3604d751f03002e8e0e7650aa71d8d9148144a87daf17cb1f3228e80747f2e6b"},
