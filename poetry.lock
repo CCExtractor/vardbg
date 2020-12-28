@@ -139,7 +139,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 
 [[package]]
 name = "importlib-resources"
-version = "4.1.0"
+version = "4.1.1"
 description = "Read resources from Python packages"
 category = "dev"
 optional = false
@@ -400,8 +400,8 @@ importlib-metadata = [
     {file = "importlib_metadata-3.3.0.tar.gz", hash = "sha256:5c5a2720817414a6c41f0a49993908068243ae02c1635a228126519b509c8aed"},
 ]
 importlib-resources = [
-    {file = "importlib_resources-4.1.0-py3-none-any.whl", hash = "sha256:1de368454cabd37265215f584eaefa92f7ea5dffd1c22c8de48d565431ecd9f1"},
-    {file = "importlib_resources-4.1.0.tar.gz", hash = "sha256:01fe9f1f2000677b2cdc7838473143341401d010eee276d2fcb64c219f624a25"},
+    {file = "importlib_resources-4.1.1-py3-none-any.whl", hash = "sha256:0a948d0c8c3f9344de62997e3f73444dbba233b1eaf24352933c2d264b9e4182"},
+    {file = "importlib_resources-4.1.1.tar.gz", hash = "sha256:6b45007a479c4ec21165ae3ffbe37faf35404e2041fac6ae1da684f38530ca73"},
 ]
 isort = [
     {file = "isort-5.6.4-py3-none-any.whl", hash = "sha256:dcab1d98b469a12a1a624ead220584391648790275560e1a43e54c5dceae65e7"},
