@@ -139,7 +139,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 
 [[package]]
 name = "importlib-resources"
-version = "4.1.1"
+version = "5.0.0"
 description = "Read resources from Python packages"
 category = "dev"
 optional = false
@@ -149,8 +149,8 @@ python-versions = ">=3.6"
 zipp = {version = ">=0.4", markers = "python_version < \"3.8\""}
 
 [package.extras]
-docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
-testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "jaraco.test (>=3.2.0)", "pytest-black (>=0.3.7)", "pytest-mypy"]
+docs = ["sphinx", "jaraco.packaging (>=8.2)", "rst.linker (>=1.9)"]
+testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "pytest-enabler", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [[package]]
 name = "isort"
@@ -400,8 +400,8 @@ importlib-metadata = [
     {file = "importlib_metadata-3.3.0.tar.gz", hash = "sha256:5c5a2720817414a6c41f0a49993908068243ae02c1635a228126519b509c8aed"},
 ]
 importlib-resources = [
-    {file = "importlib_resources-4.1.1-py3-none-any.whl", hash = "sha256:0a948d0c8c3f9344de62997e3f73444dbba233b1eaf24352933c2d264b9e4182"},
-    {file = "importlib_resources-4.1.1.tar.gz", hash = "sha256:6b45007a479c4ec21165ae3ffbe37faf35404e2041fac6ae1da684f38530ca73"},
+    {file = "importlib_resources-5.0.0-py3-none-any.whl", hash = "sha256:ea17df80a0ff04b5dbd3d96dbeab1842acfd1c6c902eaeb8c8858abf2720161e"},
+    {file = "importlib_resources-5.0.0.tar.gz", hash = "sha256:4743f090ed8946e713745ec0e660249ef9fb0b9843eacc5b5ff931d2fd5aa67f"},
 ]
 isort = [
     {file = "isort-5.7.0-py3-none-any.whl", hash = "sha256:fff4f0c04e1825522ce6949973e83110a6e907750cd92d128b0d14aaaadbffdc"},
