@@ -25,7 +25,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.6"
 dictdiffer = "^0.8.1"
-jsonpickle = "^1.2"
+jsonpickle = ">=1.2,<3.0"
 opencv-python = "^4.1.2"
 pillow = ">=7,<9"
 sortedcontainers = "^2.1.0"
