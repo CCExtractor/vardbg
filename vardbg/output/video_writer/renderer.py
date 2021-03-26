@@ -90,7 +90,7 @@ class FrameRenderer:
             self.write_intro()
 
     def text_size(self, text, factor=10, **kwargs):
-        cache_key = (text, kwargs.get("font", None))
+        cache_key = (text, kwargs.get("font"))
 
         if cache_key in self.text_size_cache:
             return self.text_size_cache[cache_key]
