@@ -1,6 +1,5 @@
 import numbers
 import statistics
-import sys
 
 import click
 

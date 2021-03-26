@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pygments
 from pygments.lexers.python import PythonLexer
-from pygments.token import Token
 
 from ... import render
 from ..writer import Writer
