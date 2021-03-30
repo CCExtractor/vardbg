@@ -3,7 +3,7 @@ from pathlib import Path
 
 import click
 
-from . import ansi, debugger
+from . import debugger
 
 DESC = "A simple Python debugger and profiler that can generate animated visualizations of program flow."
 

@@ -3,4 +3,4 @@ INTERNAL_FUNC_CODES = set()
 
 
 def add_funcs(*funcs):
-    INTERNAL_FUNC_CODES.update(set(fn.__code__ for fn in funcs))
+    INTERNAL_FUNC_CODES.update({fn.__code__ for fn in funcs})

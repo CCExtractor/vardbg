@@ -10,9 +10,6 @@ if TYPE_CHECKING:
 
 
 class Replayer(abc.ABC):
-    def __init__(self: "Debugger"):
-        # Propagate initialization to other mixins
-        super().__init__()
 
     def replay_events(self: "Debugger", events):
         for event in events:
