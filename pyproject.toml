@@ -31,7 +31,7 @@ pillow = ">=7,<9"
 sortedcontainers = "^2.1.0"
 toml = "^0.10.0"
 pygments = "^2.5.2"
-click = "^7.0"
+click = ">=7,<9"
 colorama = "^0.4.3"
 imageio = "^2.6.1"
 
