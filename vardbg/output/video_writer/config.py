@@ -1,15 +1,18 @@
 import collections.abc
 from pathlib import Path
+import math
 
 import toml
 from pygments.formatter import Formatter
-from pygments.styles.monokai import MonokaiStyle
+from vardbg.assets.styles.default import DefaultStyle
 from pygments.token import Token
 
 FILE_PATH = Path(__file__).parent
 ASSETS_PATH = FILE_PATH / ".." / ".." / "assets"
 DEFAULT_CFG_PATH = FILE_PATH / "default_config.toml"
 
+# List for colors in color_scheme
+color_list = []
 
 # Source: https://stackoverflow.com/a/3233356
 def recursive_update(base, new):
@@ -58,6 +61,17 @@ def parse_hex_color(string):
 
     return r, g, b, 255
 
+# Some color_scheme can have same txt and bg color
+def color_contrast(body_txt):
+    contrast = (int(body_txt[0] * 299) + int(body_txt[1] * 587) + int(body_txt[2] * 114)) / 1000
+    if (contrast >= 128):  
+        return (50,50,50,255) # return grey
+    else:
+        return (255,255,255,255) # return white
+
+# Calculate distance btw two color
+def color_similarity(base_col_val,oth_col_val):
+    return math.sqrt(sum((base_col_val[i]-oth_col_val[i])**2 for i in range(3)))
 
 def load_style(style):
     styles = {}
@@ -65,11 +79,9 @@ def load_style(style):
 
     for token, params in formatter.style:
         color = parse_hex_color(params["color"]) if params["color"] else None
-        # Italic and underline styles aren't supported, so just use bold for them
-        bold = params["bold"] or params["italic"] or params["underline"]
 
         # Save style
-        styles[token] = {"color": color, "bold": bold}
+        styles[token] = {"color": color}
 
     return styles
 
@@ -106,16 +118,16 @@ class Config:
         self.font_heading = (sub_path(fonts["heading"]), fonts["heading_size"])
         self.font_intro = (sub_path(fonts["intro"]), fonts["intro_size"])
 
-        style = MonokaiStyle
+        style = DefaultStyle
         self.styles = load_style(style)
 
         self.bg = parse_hex_color(style.background_color)
         self.highlight = parse_hex_color(style.highlight_color)
         self.fg_divider = self.styles[Token.Generic.Subheading]["color"]
         self.fg_heading = self.styles[Token.Name]["color"]
-        self.fg_body = self.styles[Token.Text]["color"]
+        self.fg_body = color_contrast(self.bg)
         self.fg_watermark = self.styles[Token.Comment]["color"]
-
+        
         self.red = self.styles[Token.Operator]["color"]
         self.green = self.styles[Token.Name.Function]["color"]
         self.blue = self.styles[Token.Keyword]["color"]
